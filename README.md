@@ -1,4 +1,4 @@
-# Vibe Coding Coach
+# Vibe Coding Coach# Vibe Coding Coach
 
 > 一个单文件 HTML 实现的「对话式 AI 教练」：Vibe Coding Coach 是一款通过8步结构化引导与智能工具匹配，将模糊想法转化为标准化AI开发执行清单的Vibe Coding前置导航工具。
 
@@ -6,16 +6,16 @@
 
 ![demo](https://img.shields.io/badge/demo-single_file-orange) ![stack](https://img.shields.io/badge/stack-vanilla_JS-blue) ![llm](https://img.shields.io/badge/llm-DeepSeek-4d6bff) ![search](https://img.shields.io/badge/search-博查-00a86b)
 
----
+------
 
 ## ✨ 这是什么
 
-Vibe Coding Coach 致力于降低 AI 辅助编程的门槛，将“Vibe Coding”（氛围编程）从一种模糊的概念转化为可执行、可复用的标准化工作流。它不替代 AI 编码工具，而是vibe coding的引导助手，帮助用户在动手写代码前，通过结构化引导厘清需求、匹配工具、生成执行清单，让 AI 协作从“试错式对话”升级为“目标导向的精准开发”，真正实现“想法到项目”的高效转化。
+Vibe Coding Coach 致力于降低 AI 辅助编程的门槛，将“Vibe Coding”（氛围编程）从一种模糊的概念转化为可执行、可复用的标准化工作流。它不替代 AI 编码工具，而是vibe coding的引导助手，帮助用户在动手写代码前，通过结构化引导厘清需求、匹配工具、生成执行清单，让 AI 协作从“试错式对话”升级为“目标导向的精准开发”，真正实现“想法到项目”的高效转化。Vibe Coding Coach 致力于降低 AI 辅助编程的门槛，将“Vibe Coding”（氛围编程）从一种模糊的概念转化为可执行、可复用的标准化工作流。它不替代 AI 编码工具，而是vibe coding的引导助手，帮助用户在动手写代码前，通过结构化引导厘清需求、匹配工具、生成执行清单，让 AI 协作从“试错式对话”升级为“目标导向的精准开发”，真正实现“想法到项目”的高效转化。
 
-适合：
+适合：适合：
 
-- 🎓 想入门编程/AI 开发但不知从哪下手的纯小白
-- 💼 准备做作品集/求职 demo 的开发者
+- 🎓 想入门编程/AI 开发但不知从哪下手的纯小白 🎓 想入门编程/AI 开发但不知从哪下手的纯小白 🎓 想入门编程/AI 开发但不知从哪下手的纯小白 🎓 想入门编程/AI 开发但不知从哪下手的纯小白
+- 💼 准备做作品集/求职 demo 的开发者 💼 准备做作品集/求职 demo 的开发者 💼 准备做作品集/求职 demo 的开发者 💼 准备做作品集/求职 demo 的开发者
 - 🛠️ 想用 AI 解决身边重复劳动的非技术人
 - 🧪 给面试官演示「对话式 AI 产品」怎么设计
 
@@ -108,8 +108,8 @@ python3 -m http.server 8000
 | 服务商 | DeepSeek / OpenAI / Moonshot / 通义千问 / 自定义 | DeepSeek |
 | Base URL | OpenAI 兼容格式的 API 入口 | `https://api.deepseek.com/v1` |
 | 模型 | 服务商支持的模型列表 | `deepseek-chat` |
-| API Key | 你的 LLM API Key | 预置（demo 用，**正式部署前请替换**） |
-| 联网搜索 Key | 博查 API Key（可选） | 预置（同上） |
+| API Key | 你的 LLM API Key | 预置 |
+| 联网搜索 Key | 博查 API Key | 预置 |
 
 🔒 隐私说明：所有 API Key 配置、对话记录、个人信息全部存储在浏览器本地 LocalStorage，**不上传任何服务器**，数据完全由用户自己掌控。
 
