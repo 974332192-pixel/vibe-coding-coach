@@ -1,0 +1,2760 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibe Coding Coach · 氛围编程私人教练</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#f5f5f7;height:100vh;display:flex;color:#1a1a1a}
+.left{flex:1;display:flex;flex-direction:column;background:white;border-right:1px solid #e5e5e7;min-width:0}
+.right{width:400px;background:#fafafa;display:flex;flex-direction:column}
+.hd{padding:14px 20px;border-bottom:1px solid #e5e5e7;display:flex;justify-content:space-between;align-items:center;background:white}
+.hd h1{margin:0;font-size:16px;font-weight:600}
+.bdg{font-size:11px;padding:3px 8px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;color:#fff;font-weight:500}
+.btn-sm{padding:4px 10px;background:#f0f0f0;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;color:#333;transition:all .15s}
+.btn-sm:hover{background:#e5e5e5}
+.msgs{flex:1;overflow-y:auto;padding:20px;scroll-behavior:smooth}
+.empty{text-align:center;color:#999;padding:60px 20px}
+.empty h2{color:#333;margin-bottom:10px;font-size:20px}
+.empty p{font-size:13px;line-height:1.6;margin-bottom:6px}
+.msg{display:flex;gap:10px;margin-bottom:18px;max-width:92%;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.msg.u{margin-left:auto;flex-direction:row-reverse}
+.av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:#fff;font-weight:600}
+.msg.u .av{background:#2c5cff}
+.msg-body{display:flex;flex-direction:column;max-width:100%;min-width:0}
+.msg.u .msg-body{align-items:flex-end}
+.bub{background:white;border:1px solid #e5e5e7;padding:11px 14px;border-radius:10px;line-height:1.7;font-size:14px;white-space:pre-wrap;word-wrap:break-word;max-width:100%;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.msg.u .bub{background:#2c5cff;color:white;border-color:#2c5cff}
+.bub strong{font-weight:600}
+.bub .big-title{font-size:15px;font-weight:600;margin:12px 0 6px;color:#1a1a1a;display:block;line-height:1.4}
+.bub .big-title:first-child{margin-top:0}
+.bub .label{font-weight:600;color:#2c5cff;background:rgba(44,92,255,.08);padding:1px 6px;border-radius:4px}
+.bub .list-item{padding-left:8px;margin:4px 0;line-height:1.7;display:block}
+.bub .divider{border:none;border-top:1px solid #e5e5e7;margin:10px 0}
+.bub code{background:#f0f0f0;padding:1px 5px;border-radius:3px;font-family:monospace;font-size:13px;color:#c7254e}
+.bub pre{background:#1e1e1e;color:#d4d4d4;padding:12px;border-radius:6px;overflow-x:auto;margin:8px 0;font-size:12.5px;line-height:1.5;font-family:Menlo,Monaco,monospace;white-space:pre}
+.bub pre code{background:transparent;padding:0;color:inherit;font-size:inherit}
+.msg-options{display:flex;flex-direction:column;gap:8px;margin-top:10px;max-width:100%;align-items:flex-start}
+.step-indicator{display:inline-block;padding:4px 10px;background:linear-gradient(135deg,rgba(102,126,234,.1),rgba(118,75,162,.1));border-left:3px solid #667eea;border-radius:0 6px 6px 0;font-size:11px;font-weight:600;color:#667eea;letter-spacing:.3px;margin-bottom:6px;cursor:default;user-select:none;max-width:100%;line-height:1.4}
+.option-btn{display:block;width:100%;max-width:480px;padding:11px 14px;background:white;border:1px solid #e5e5e7;border-radius:10px;text-align:left;font-size:13px;cursor:pointer;font-family:inherit;transition:all .15s;line-height:1.5;color:#1a1a1a;position:relative}
+.option-btn:hover:not(:disabled){background:#2c5cff;color:white;border-color:#2c5cff;transform:translateX(2px);box-shadow:0 2px 8px rgba(44,92,255,.2)}
+.option-btn:disabled{cursor:default;opacity:.55;background:#f5f5f7;color:#888;transform:none !important}
+.option-btn:disabled:hover{background:#f5f5f7;color:#888;border-color:#e5e5e7;box-shadow:none}
+.inp{padding:14px 20px;border-top:1px solid #e5e5e7;background:white}
+.status-bar{padding:8px 20px;background:#f5f5f7;font-size:12px;color:#666;display:flex;align-items:center;gap:8px;border-top:1px solid #e5e5e7;min-height:32px}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid #2c5cff;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.row{display:flex;gap:6px}
+.row input{flex:1;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit;min-width:0}
+.row input:focus{outline:none;border-color:#2c5cff;box-shadow:0 0 0 3px rgba(44,92,255,.1)}
+.row button{padding:10px 18px;background:#2c5cff;color:white;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;white-space:nowrap;font-weight:500}
+.row button:hover{background:#1e4ce0}
+.row button:disabled{background:#ccc;cursor:not-allowed}
+.ph{padding:20px;color:#999;font-size:13px;font-style:italic;text-align:center;margin:auto}
+
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999}
+.modal.hidden{display:none}
+.modal-content{background:white;padding:24px;border-radius:12px;width:480px;max-width:90vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-content h2{margin:0 0 8px;font-size:18px}
+.modal-content p.sub{color:#666;font-size:13px;margin:0 0 16px;line-height:1.5}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:13px;font-weight:500;margin-bottom:5px}
+.form-group input,.form-group select{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;font-family:inherit}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:#2c5cff}
+.form-group .hint{font-size:11px;color:#999;margin-top:4px;line-height:1.5}
+.form-group .hint a{color:#2c5cff;text-decoration:none}
+.form-group .hint a:hover{text-decoration:underline}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.btn{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:500}
+.btn-primary{background:#2c5cff;color:white}
+.btn-secondary{background:#f0f0f0;color:#333}
+
+/* 方案书样式 */
+.plan-doc{padding:20px;font-size:13px;line-height:1.7}
+.plan-doc h2{font-size:17px;margin:16px 0 8px;color:#1a1a1a;border-bottom:2px solid #667eea;padding-bottom:4px}
+.plan-doc h3{font-size:14px;margin:12px 0 6px;color:#333}
+.plan-doc .meta{background:#f0f4ff;padding:10px 12px;border-radius:6px;margin-bottom:12px;font-size:12px;color:#555}
+.plan-doc .meta b{color:#2c5cff}
+.plan-doc ul{padding-left:22px;margin:6px 0}
+.plan-doc li{margin:3px 0}
+.plan-doc .step-li{padding:6px 0;display:flex;gap:8px}
+.plan-doc .step-num{min-width:22px;height:22px;background:#667eea;color:white;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.plan-doc pre{background:#1e1e1e;color:#d4d4d4;padding:12px;border-radius:6px;overflow-x:auto;margin:8px 0;font-size:12px;line-height:1.5}
+.plan-doc pre code{background:transparent;padding:0;color:inherit}
+.plan-doc .stamp{margin-top:20px;padding:10px;background:linear-gradient(135deg,#d4f4dd,#a8e6cf);border-radius:6px;color:#1e7e34;font-size:12px;text-align:center;font-weight:500}
+/* Coach 实时记忆 */
+.plan-doc .memory-status{background:#f8f9ff;border:1px solid #e5e7f5;border-radius:6px;padding:8px 10px;margin:8px 0}
+.plan-doc .mem-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12.5px;border-bottom:1px solid rgba(0,0,0,.04)}
+.plan-doc .mem-row:last-child{border-bottom:none}
+.plan-doc .mem-status{display:inline-block;width:18px;text-align:center;font-weight:700;flex-shrink:0}
+.plan-doc .mem-done .mem-status{color:#10b981}
+.plan-doc .mem-pending .mem-status{color:#f59e0b}
+.plan-doc .mem-empty .mem-status{color:#cbd5e0}
+.plan-doc .mem-key{flex:0 0 36px;color:#667eea;font-weight:600}
+.plan-doc .mem-val{flex:1;color:#1a1a1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 决策历史时间线 */
+.plan-doc .history-timeline{background:#fafbfc;border:1px solid #e5e7eb;border-radius:6px;padding:8px 10px;margin:8px 0;max-height:240px;overflow-y:auto}
+.plan-doc .history-item{display:flex;gap:8px;padding:3px 0;font-size:11.5px;line-height:1.4;border-bottom:1px dashed rgba(0,0,0,.05)}
+.plan-doc .history-item:last-child{border-bottom:none}
+.plan-doc .history-time{color:#9ca3af;font-family:monospace;flex-shrink:0}
+.plan-doc .history-step{background:rgba(102,126,234,.1);color:#667eea;padding:0 5px;border-radius:3px;font-size:10px;font-weight:600;flex-shrink:0;align-self:center}
+.plan-doc .history-text{flex:1;color:#374151;overflow:hidden;text-overflow:ellipsis}
+/* 顶部实时记忆条 */
+/* 顶部记忆条已隐藏（用户要求删除）*/
+
+@media (max-width:768px){
+body{flex-direction:column}
+.right{width:100%;height:300px;border-top:1px solid #e5e5e7}
+}
+</style>
+</head>
+<body>
+<div class="left">
+  <div class="hd">
+    <h1>⚡ Vibe Coding Coach</h1>
+    <div>
+      <span class="bdg">8 步引导 + 实战陪跑</span>
+      <span id="builtInBadge" style="margin-left:6px;font-size:11px;padding:3px 8px;background:linear-gradient(135deg,#10b981,#059669);border-radius:10px;color:#fff;font-weight:500;cursor:pointer" title="点击切换/重置 key">🔑 已预置 DeepSeek + 博查</span>
+      <button class="btn-sm" id="settingsBtn" style="margin-left:6px">⚙️ 设置</button>
+    </div>
+  </div>
+  <div class="msgs" id="msgs"></div>
+  <div class="status-bar" id="statusBar" style="display:none">
+    <span class="spinner"></span>
+    <span id="statusText">Coach 正在思考...</span>
+  </div>
+  <div class="inp">
+    <div class="row">
+      <input type="text" id="ti" placeholder="跟 Coach 说话（或直接打字描述你的痛点）...">
+      <button id="sb">发送</button>
+    </div>
+  </div>
+</div>
+<div class="right">
+  <div class="hd">
+    <h1>📋 方案书</h1>
+    <button class="btn-sm" id="rb">重置</button>
+  </div>
+  <div class="msgs" id="prev"><div class="ph">完成所有阶段后，方案书会在这里实时生成 ✨</div></div>
+</div>
+
+<div id="settingsModal" class="modal hidden">
+  <div class="modal-content">
+    <h2>⚙️ 配置 LLM（可选）</h2>
+    <p class="sub">不配也能用演示版（按节点走脚本）。配了能跟 Coach 自由对话、跳出节点限制。</p>
+    <div class="form-group">
+      <label>服务商</label>
+      <select id="provider">
+        <option value="deepseek">DeepSeek（国内可访问，推荐）</option>
+        <option value="openai">OpenAI（需要科学上网）</option>
+        <option value="moonshot">Moonshot/Kimi（国内）</option>
+        <option value="qwen">通义千问（国内）</option>
+        <option value="custom">自定义（OpenAI 兼容）</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Base URL</label>
+      <input id="baseUrl" value="https://api.deepseek.com/v1">
+      <div class="hint" id="baseUrlHint">DeepSeek 默认地址</div>
+    </div>
+    <div class="form-group">
+      <label>模型</label>
+      <select id="model"></select>
+      <div class="hint" id="modelHint"></div>
+    </div>
+    <div class="form-group">
+      <label>API Key</label>
+      <input id="apiKey" type="password" placeholder="sk-...">
+      <div class="hint">
+        在 <a href="https://platform.deepseek.com/api_keys" target="_blank">DeepSeek 平台</a> 申请（新用户有免费额度）<br>
+        API Key 只保存在你浏览器，不上传任何服务器
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>联网搜索 Key（可选）</label>
+      <input id="tavilyKey" type="password" placeholder="sk-... (博查 key)">
+      <div class="hint">
+        申请：<a href="https://open.bochaai.com" target="_blank">open.bochaai.com</a>（微信扫码注册,DeepSeek 联网搜索用的就是它）<br>
+        不填也能用,本地 RAG 库(37 个工具)够用;填了能查 2026 年最新工具
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="resetBuiltIn" style="background:#fef3c7;color:#92400e;margin-right:auto" title="把 API Key 还原成页面里预置的那个">🔄 重置为预置</button>
+      <button class="btn btn-secondary" id="skipConfig">稍后再说</button>
+      <button class="btn btn-primary" id="saveConfig">保存并启用</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Vibe Coding Coach · 8 步引导 + 中期实战陪跑
+// 全局最高优先级：动态路由与流程接管机制
+// 流程是脚手架，不是枷锁
+
+// ==================== 用户画像（实时累积）====================
+var profile = {
+  background: '',      // 编程基础
+  purpose: '',         // 核心目的
+  pain: '',            // 痛点
+  painChips: [],       // 痛点相关的选择轨迹
+  form: '',            // 产品形态 Skill/Agent/融合体
+  network: '',         // 网络环境
+  budget: '',          // 预算
+  tools: [],           // 候选工具
+  pickedTool: '',      // 最终工具
+  planA: null,         // 工程方案 A
+  planB: null,         // 工程方案 B
+  pickedPlan: null,    // 选定方案
+  confirmed: {},       // 走过的 step 标记：{s1: true, s2: true, ...}
+  history: []          // 决策历史时间线：[{time, step, text}, ...]
+};
+
+// ==================== 决策历史记录 ====================
+// 任何 profile 字段变更都应该走这个函数，让右侧方案书的"决策历史"实时更新
+function addHistory(stepGroup, key, text) {
+  var t = new Date();
+  var time = t.getHours().toString().padStart(2, '0') + ':' + t.getMinutes().toString().padStart(2, '0') + ':' + t.getSeconds().toString().padStart(2, '0');
+  profile.history.push({
+    time: time,
+    step: stepGroup,
+    key: key,
+    text: text
+  });
+  // 最多保留 50 条
+  if (profile.history.length > 100) profile.history = profile.history.slice(-100);
+}
+
+// ==================== Memory Snapshot ====================
+// 生成给 LLM 看的"实时记忆块"，让 LLM 在每一轮都看到当前状态
+function getMemorySnapshot() {
+  var p = profile;
+  var lines = [];
+  lines.push('【Coach 实时记忆】');
+  lines.push('- 背景（编程基础）: ' + (p.background || '? 未填'));
+  lines.push('- 目的（核心目标）: ' + (p.purpose || '? 未填'));
+  lines.push('- 痛点: ' + (p.pain || '? 未填'));
+  lines.push('- 产品形态: ' + (p.form || '? 未选'));
+  lines.push('- 网络环境: ' + (p.network || '? 未填'));
+  lines.push('- 预算: ' + (p.budget ? p.budget + ' 元/月' : '? 未填'));
+  lines.push('- 推荐工具: ' + (p.pickedTool || '? 未选'));
+  lines.push('- 选定方案: ' + (p.pickedPlan || '? 未选'));
+  lines.push('- 已确认步骤: ' + Object.keys(p.confirmed || {}).filter(function(k){ return p.confirmed[k]; }).join(', ') || '无');
+  // 决策历史（最近 8 条）
+  if (p.history && p.history.length > 0) {
+    lines.push('- 最近决策:');
+    p.history.slice(-20).forEach(function(h) {
+      lines.push('  · [' + h.step + '] ' + h.text);
+    });
+  }
+  return lines.join('\n');
+}
+
+// ==================== 工具 RAG 知识库
+
+// ==================== 按需检索:用户消息触发 RAG 的判断 ====================
+// 凡是用户问工具推荐 / 选择 / 筛选 / 对比 / 哪个好 / A vs B,都从这里捞相关工具
+var RAG_TRIGGER_KEYWORDS = {
+  // 强触发:用户提到了具体工具名(任意一个)
+  toolNames: [
+    '扣子','Coze','腾讯元器','元器','文心智能体','阿里百炼','百炼',
+    'BetterYeah','Agentar','Power Platform','Copilot Studio','秒哒','Miaoda',
+    'Dify','Flowise','n8n','Make','Integromat','LangChain','LlamaIndex',
+    'AutoGen','CrewAI','ChatDev',
+    'minimax code','minimax','Mavis','Cursor','Trae','MarsCode','豆包','通义灵码','Lingma','CodeBuddy',
+    '文心快码','Comate','CodeGeeX','Copilot','GitHub Copilot',
+    'Windsurf','Codeium','Tabnine','Amazon Q','Q Developer',
+    'JetBrains AI','JetBrains','Sourcegraph','Cody','Fitten','OpenCode',
+    'Claude Code','Plandex','Warp','iFlow'
+  ],
+  // 中触发:用户意图词
+  intentWords: [
+    '推荐','推荐个','推荐一下','有哪些','有哪些工具','罗列','罗列一下',
+    '选哪个','选个','怎么选','选哪','哪个好','哪个适合','哪个更','哪个最',
+    '对比','比较','区别','差异','vs','VS','还是',
+    '筛选','过滤','挑一个','挑个','帮我挑','帮我选',
+    '适合我','适合小白','适合新手',
+    '用什么','用哪个','用啥','用啥好','用啥工具'
+  ],
+  // 弱触发:大分类词(只触发分类下所有)
+  categoryWords: [
+    '零代码','低代码','零代码平台','低代码平台','Agent 平台',
+    '工作流','工作流编排','流程编排',
+    'IDE','编辑器','AI IDE','AI 编辑器','编程 IDE',
+    '命令行','终端','CLI','终端 AI','命令行助手'
+  ]
+};
+
+function shouldTriggerRag(userText) {
+  if (!userText || typeof userText !== 'string') return false;
+  var t = userText;
+  for (var i = 0; i < RAG_TRIGGER_KEYWORDS.toolNames.length; i++) {
+    if (t.indexOf(RAG_TRIGGER_KEYWORDS.toolNames[i]) >= 0) return 'tool';
+  }
+  for (var j = 0; j < RAG_TRIGGER_KEYWORDS.intentWords.length; j++) {
+    if (t.indexOf(RAG_TRIGGER_KEYWORDS.intentWords[j]) >= 0) return 'intent';
+  }
+  for (var k = 0; k < RAG_TRIGGER_KEYWORDS.categoryWords.length; k++) {
+    if (t.indexOf(RAG_TRIGGER_KEYWORDS.categoryWords[k]) >= 0) return 'category';
+  }
+  return false;
+}
+
+// 按需检索:根据用户消息,捞出最相关的工具 + 选型建议
+function getRelevantRagForQuery(userText) {
+  var trigger = shouldTriggerRag(userText);
+  if (!trigger) return '';
+  var lines = [];
+  lines.push('\n## 🎯 按需检索结果(基于用户最新消息触发)');
+  var t = userText;
+  var matchedTools = [];
+  var matchedCategories = {};
+
+  // 1) 抓取消息里命中的工具
+  for (var i = 0; i < TOOL_RAG.length; i++) {
+    var tool = TOOL_RAG[i];
+    if (t.indexOf(tool.name) >= 0) {
+      matchedTools.push(tool);
+      continue;
+    }
+    // 匹配别名(中英文)
+    var aliases = {
+      '扣子 (Coze)': ['扣子','Coze'],
+      '腾讯元器': ['腾讯元器','元器'],
+      '阿里百炼 (Bailian)': ['阿里百炼','百炼','Bailian'],
+      '文心快码 Comate': ['文心快码','Comate'],
+      '通义灵码 (Lingma)': ['通义灵码','Lingma'],
+      '豆包 MarsCode': ['MarsCode','豆包 MarsCode'],
+      'GitHub Copilot': ['Copilot','GitHub Copilot'],
+      'JetBrains AI Assistant': ['JetBrains AI','JetBrains'],
+      'Amazon Q Developer': ['Amazon Q','Q Developer'],
+      'Make (原 Integromat)': ['Make','Integromat'],
+      '微软 Power Platform (Copilot Studio)': ['Power Platform','Copilot Studio'],
+      '蚂蚁数科 Agentar': ['Agentar'],
+      'BetterYeah AI': ['BetterYeah'],
+      '秒哒 (Miaoda)': ['秒哒','Miaoda'],
+      'Windsurf (Codeium)': ['Windsurf','Codeium'],
+      'Sourcegraph Cody': ['Sourcegraph','Cody'],
+      'Claude Code': ['Claude Code'],
+      'iFlow CLI': ['iFlow'],
+      'minimax code': ['minimax','minimax code','Mavis','MiniMax']
+    }[tool.name] || [tool.name];
+    for (var a = 0; a < aliases.length; a++) {
+      if (t.indexOf(aliases[a]) >= 0) {
+        matchedTools.push(tool);
+        break;
+      }
+    }
+  }
+
+  // 2) 抓取消息里命中的分类
+  var catMap = {
+    '零代码': '零代码/低代码 Agent 平台',
+    '低代码': '零代码/低代码 Agent 平台',
+    '零代码平台': '零代码/低代码 Agent 平台',
+    'Agent 平台': '零代码/低代码 Agent 平台',
+    '工作流': '工作流编排型 Agent 平台',
+    '工作流编排': '工作流编排型 Agent 平台',
+    '流程编排': '工作流编排型 Agent 平台',
+    'IDE': 'AI 编程 IDE/编辑器',
+    '编辑器': 'AI 编程 IDE/编辑器',
+    'AI IDE': 'AI 编程 IDE/编辑器',
+    '编程 IDE': 'AI 编程 IDE/编辑器',
+    '命令行': '命令行/终端 AI 助手',
+    '终端': '命令行/终端 AI 助手',
+    'CLI': '命令行/终端 AI 助手'
+  };
+  Object.keys(catMap).forEach(function(k) {
+    if (t.indexOf(k) >= 0) {
+      var cat = catMap[k];
+      if (!matchedCategories[cat]) matchedCategories[cat] = true;
+    }
+  });
+
+  // 3) 输出匹配到的工具详情
+  if (matchedTools.length > 0) {
+    var seen = {};
+    matchedTools = matchedTools.filter(function(x) {
+      if (seen[x.name]) return false;
+      seen[x.name] = true;
+      return true;
+    });
+    lines.push('\n### 用户问到的工具(原始描述)');
+    matchedTools.forEach(function(tool) {
+      lines.push('\n#### ' + tool.name + ' [' + tool.category + ']');
+      lines.push('- 擅长: ' + tool.strength);
+      if (tool.difficulty) lines.push('- 门槛: ' + tool.difficulty);
+      if (tool.network) lines.push('- 网络: ' + tool.network);
+      if (tool.deploy) lines.push('- 部署: ' + tool.deploy);
+      if (tool.cost) lines.push('- 费用: ' + tool.cost);
+    });
+  }
+
+  // 4) 输出分类下的所有工具(只列名字 + 1 句擅长,降 token)
+  var catsToShow = Object.keys(matchedCategories);
+  if (catsToShow.length > 0) {
+    lines.push('\n### 分类下的工具一览(用户问到了分类)');
+    catsToShow.forEach(function(cat) {
+      var toolsInCat = TOOL_RAG.filter(function(x){ return x.category === cat; });
+      lines.push('\n**[' + cat + '](' + toolsInCat.length + ' 个)**');
+      toolsInCat.forEach(function(tool) {
+        var shortStrength = tool.strength.length > 50 ? tool.strength.slice(0, 50) + '…' : tool.strength;
+        lines.push('- ' + tool.name + ': ' + shortStrength);
+      });
+    });
+  }
+
+  // 5) 输出选型建议
+  if (typeof SELECTION_ADVICE !== 'undefined' && SELECTION_ADVICE) {
+    lines.push('\n### 选型建议(按场景)');
+    if (SELECTION_ADVICE.core_logic && SELECTION_ADVICE.core_logic.length > 0) {
+      lines.push('**核心选型逻辑:**');
+      SELECTION_ADVICE.core_logic.forEach(function(c) {
+        lines.push('- ' + c);
+      });
+    }
+    var adviceKeys = Object.keys(SELECTION_ADVICE).filter(function(k) {
+      return k !== 'core_logic' && k !== 'appendix';
+    });
+    adviceKeys.forEach(function(catKey) {
+      var shouldShow = (matchedTools.length === 0 && catsToShow.length === 0);
+      if (!shouldShow && catsToShow.indexOf(catKey) >= 0) shouldShow = true;
+      if (!shouldShow && matchedTools.length > 0) {
+        for (var i = 0; i < matchedTools.length; i++) {
+          if (matchedTools[i].category === catKey) {
+            shouldShow = true;
+            break;
+          }
+        }
+      }
+      if (shouldShow && SELECTION_ADVICE[catKey] && SELECTION_ADVICE[catKey].length > 0) {
+        lines.push('\n**' + catKey + ':**');
+        SELECTION_ADVICE[catKey].forEach(function(a) {
+          lines.push('- ' + a);
+        });
+      }
+    });
+    if (matchedTools.length === 0 && catsToShow.length === 0 && SELECTION_ADVICE.appendix) {
+      lines.push('\n**快速选型对照表:**');
+      SELECTION_ADVICE.appendix.forEach(function(row) {
+        lines.push('- [' + row.type + '] 工具:' + row.tools + ' | 人群:' + row.audience + ' | 难度:' + row.difficulty + ' | 网络:' + row.network + ' | 费用:' + row.cost);
+      });
+    }
+  }
+
+  lines.push('\n### 回答要求');
+  lines.push('- **必须**基于上面 RAG 内容回答,不要凭印象编造工具或价格');
+  lines.push('- 用户问到的工具,严格按"擅长/门槛/网络/部署/费用"5 个字段描述');
+  lines.push('- 用户问"对比",按 RAG 数据做并列对比(擅长、门槛、网络、费用)');
+  lines.push('- 用户问"推荐/选哪个",结合用户画像(purpose/network/budget)给 1-3 个最匹配的,引用 RAG 的优势描述');
+
+  return lines.join('\n');
+}
+
+// ==================== 工具 RAG 知识库上下文生成 ====================
+// 生成给 LLM 看的工具知识库
+function getRagContext() {
+  if (typeof TOOL_RAG === 'undefined' || !TOOL_RAG || TOOL_RAG.length === 0) {
+    return '';
+  }
+  var lines = ['你手边有 ' + TOOL_RAG.length + ' 个工具的真实描述，按用户画像选 1-3 个推荐：'];
+  TOOL_RAG.forEach(function(t) {
+    lines.push('\n### ' + t.name + ' [' + t.category + ']');
+    lines.push('- 擅长：' + t.strength);
+    if (t.difficulty) lines.push('- 门槛：' + t.difficulty);
+    if (t.network) lines.push('- 网络：' + t.network);
+    if (t.cost) lines.push('- 费用：' + t.cost);
+  });
+  return lines.join('\n');
+}
+
+// ==================== 工具 RAG 知识库（36 个工具，源自《AI 编程工具与 Agent 平台全景指南 2026》）====================
+// 自动生成,基于《AI 编程工具与 Agent 平台全景指南 2026》
+var TOOL_RAG = [
+  {"name": "扣子 (Coze)", "category": "零代码/低代码 Agent 平台", "strength": "国内目前生态最丰富的Agent平台。特别擅长多模态工作流（如：自动抓取网页→总结→生成播客音频→发布小红书）。内置海量插件和知识库，适合做自媒体助手、轻量级客服、个人知识管理。", "difficulty": "⭐⭐⭐⭐⭐（极低）。拖拽式编排，有\"一键生成工作流\"功能，新手也能在10分钟内跑通第一个Bot。", "network": "❌ 不需要。国内版（coze.cn）完全本地化，服务器在国内，访问速度极快。", "deploy": "🟢 极低。支持一键发布到飞书、微信公众号、豆包、Web网页。API调用有详细文档，但私有化部署暂不支持。", "cost": "基础功能免费，Token消耗有每日额度限制。商业版按Token量计费，价格极具竞争力，适合中小团队起步。"},
+  {"name": "腾讯元器", "category": "零代码/低代码 Agent 平台", "strength": "微信生态的\"亲儿子\"。最擅长做微信客服、企业微信助手、公众号智能回复。在长文本理解和微信用户画像打通上有天然优势，适合做私域流量运营、售后服务自动化。", "difficulty": "⭐⭐⭐⭐（低）。界面简洁，但部分高级配置（如变量传递）需要一点逻辑基础。", "network": "❌ 不需要。纯国产环境。", "deploy": "🟢 低。核心优势就是无缝接入微信/企微，配置好AppID即可，无需额外开发网关。", "cost": "目前处于推广期，基础调用免费额度较高。后续预计按\"会话数\"或\"Token\"混合计费，对微信生态内有补贴。"},
+  {"name": "百度文心智能体平台", "category": "零代码/低代码 Agent 平台", "strength": "搜索与知识增强。依托百度搜索和百科数据，擅长事实性问答、行业报告生成、旅游攻略规划。在中文语义理解和长文档（100万字+）处理上表现稳定，适合做企业知识库、内部培训助手。", "difficulty": "⭐⭐⭐⭐（低）。提供大量行业模板（如：法律、医疗、教育），填空即可用。", "network": "❌ 不需要。", "deploy": "🟡 中等。支持Web、API、百度搜索分发。若需嵌入自有App，需走API对接，文档较全但略显繁琐。", "cost": "个人开发者免费。企业版按Token计费，文心4.0 Turbo版本性价比较高，常有企业采购折扣。"},
+  {"name": "阿里百炼 (Bailian)", "category": "零代码/低代码 Agent 平台", "strength": "电商与复杂逻辑编排。背靠阿里云，擅长商品推荐、售后工单处理、跨系统数据查询。工作流编排器非常强大，支持代码节点（Python/JS），适合需要处理复杂业务判断的B端场景。", "difficulty": "⭐⭐⭐（中）。功能极多，界面信息密度大，新手容易迷失，建议先看官方视频教程。", "network": "❌ 不需要。", "deploy": "🟡 中等。与阿里云生态（OSS、RDS、函数计算）打通极好。私有化部署需联系销售，门槛较高。", "cost": "模型调用按Token计费，通义千问系列价格战打得很凶，目前属于市场低价区。企业级SLA需额外付费。"},
+  {"name": "BetterYeah AI", "category": "零代码/低代码 Agent 平台", "strength": "企业级知识库与RAG。专注于解决\"AI胡说八道\"问题，在文档解析精度、引用溯源、权限管理上做得非常深。适合律所、咨询公司、大型企业内部知识助手，强调数据安全与合规。", "difficulty": "⭐⭐⭐（中）。配置项多，需要理解RAG切片、召回策略等概念，但客服响应极快。", "network": "❌ 不需要。", "deploy": "🟢 低（SaaS）/ 🟡 中（私有化）。SaaS版开箱即用；支持私有化部署，对信创环境（如麒麟系统、国产GPU）适配较好。", "cost": "偏贵。定位中高端B端，按\"知识库容量+并发数+私有化License\"收费，不适合个人白嫖，但企业买单意愿高。"},
+  {"name": "蚂蚁数科 Agentar", "category": "零代码/低代码 Agent 平台", "strength": "金融级安全与可信执行。擅长高敏感数据处理、合规审查、金融研报分析。底层有蚂蚁的隐私计算技术加持，确保\"数据可用不可见\"，适合银行、保险、政务场景。", "difficulty": "⭐⭐（较高）。专业术语多，流程严谨，需要一定的技术背景或经过培训。", "network": "❌ 不需要。", "deploy": "🔴 高。主推私有化/专有云部署，SaaS版仅做展示。实施周期长，需驻场或深度对接。", "cost": "项目制/高年费。不卖Token，卖解决方案和License。起步价通常在六位数以上。"},
+  {"name": "微软 Power Platform (Copilot Studio)", "category": "零代码/低代码 Agent 平台", "strength": "Office全家桶与旧系统集成。最擅长Excel数据分析、Outlook邮件自动处理、SharePoint文档管理。如果你的公司重度依赖微软生态，它是唯一解。Copilot Studio允许用自然语言修改Power Automate流程。", "difficulty": "⭐⭐⭐（中）。逻辑是\"触发器→动作\"，类似低代码，需要适应微软的术语体系。", "network": "⚠️ 需要。国内版（世纪互联）功能有阉割，AI能力受限；完整体验需使用国际版，必须科学上网。", "deploy": "🟡 中等。Teams内嵌极方便。但涉及Dataverse和API连接时，配置复杂，且国内网络环境不稳定。", "cost": "贵。按\"消息数\"或\"用户License\"收费。Copilot Studio单独计费，企业需慎重评估ROI。"},
+  {"name": "秒哒 (Miaoda)", "category": "零代码/低代码 Agent 平台", "strength": "AI生成完整应用（App/Web）。不同于做Bot，它直接生成带UI、带数据库、可交互的软件。擅长做内部工具、活动页、简易CRM。是\"Text-to-App\"赛道的领跑者，适合快速验证产品想法。", "difficulty": "⭐⭐⭐⭐（低）。对话式开发，\"帮我加个登录页\"、\"把按钮变蓝\"，像跟程序员聊天。", "network": "❌ 不需要。", "deploy": "🟢 极低。平台托管，一键发布链接。支持导出代码（React/Node.js），可自部署。", "cost": "基础生成免费。发布、自定义域名、高级组件需订阅会员或按次付费。目前处于抢占市场阶段，性价比极高。"},
+  {"name": "Dify", "category": "工作流编排型 Agent 平台", "strength": "开箱即用的LLMOps平台，擅长快速搭建RAG应用、聊天机器人和基础Agent工作流，内置知识库管理与提示词调试，适合非技术人员快速验证想法。", "difficulty": "⭐⭐（低）", "network": "否（国内可直连，开源版可本地部署）", "deploy": "⭐⭐（低，支持Docker一键部署）", "cost": "开源版免费；云端版按Token与调用量计费，入门套餐约$59/月"},
+  {"name": "Flowise", "category": "工作流编排型 Agent 平台", "strength": "纯前端拖拽式LangChain可视化编排工具，擅长快速搭建RAG管道、多模型路由与简单Agent，无需写代码即可连接各类向量数据库与LLM。", "difficulty": "⭐⭐（低）", "network": "否（开源项目，本地运行）", "deploy": "⭐⭐（低，npm或Docker均可）", "cost": "完全免费开源"},
+  {"name": "n8n", "category": "工作流编排型 Agent 平台", "strength": "自动化工作流编排利器，擅长将AI能力嵌入企业现有系统（如Slack、Notion、数据库），支持复杂条件分支、定时触发与API集成，是\"AI+自动化\"的最佳选择。", "difficulty": "⭐⭐⭐（中）", "network": "否（开源版可本地部署）", "deploy": "⭐⭐⭐（中，需配置数据库与Webhook）", "cost": "开源版免费；云端版按执行次数计费，入门约$20/月"},
+  {"name": "Make (原 Integromat)", "category": "工作流编排型 Agent 平台", "strength": "商业级自动化平台，擅长跨SaaS应用的数据同步与AI流程编排，界面直观、错误处理机制完善，适合企业级非技术用户构建稳定自动化链路。", "difficulty": "⭐⭐（低）", "network": "是（海外SaaS服务）", "deploy": "无需部署（纯云端SaaS）", "cost": "免费版有限额度；付费版按操作数计费，入门约$9/月"},
+  {"name": "LangChain", "category": "工作流编排型 Agent 平台", "strength": "AI应用开发的事实标准框架，擅长构建复杂Agent、多步推理链、工具调用与记忆管理，提供Python/JS双语言SDK，是开发者构建生产级Agent的首选底座。", "difficulty": "⭐⭐⭐⭐（高）", "network": "否（开源库，本地使用）", "deploy": "⭐⭐⭐（中，需自行搭建运行环境与依赖管理）", "cost": "完全免费开源；LangSmith等配套服务按用量计费"},
+  {"name": "LlamaIndex", "category": "工作流编排型 Agent 平台", "strength": "RAG与数据索引专家，擅长将非结构化文档（PDF、网页、数据库）高效转化为可查询的知识库，支持复杂检索策略与多文档推理，是知识库类Agent的首选。", "difficulty": "⭐⭐⭐（中）", "network": "否（开源库，本地使用）", "deploy": "⭐⭐⭐（中，需配置向量存储与嵌入模型）", "cost": "完全免费开源；LlamaCloud托管服务按数据量计费"},
+  {"name": "AutoGen", "category": "工作流编排型 Agent 平台", "strength": "多Agent对话框架，擅长让多个AI角色自动协作、互相校验与迭代任务，适合需要\"团队式\"推理的复杂场景，如代码审查、研究分析。", "difficulty": "⭐⭐⭐⭐（高）", "network": "否（开源库，本地使用）", "deploy": "⭐⭐⭐⭐（高，需配置多Agent通信与状态管理）", "cost": "完全免费开源"},
+  {"name": "CrewAI", "category": "工作流编排型 Agent 平台", "strength": "角色驱动的多Agent编排框架，擅长定义Agent角色、目标与协作流程，语法简洁直观，比AutoGen更易上手，适合快速构建\"虚拟团队\"执行结构化任务。", "difficulty": "⭐⭐⭐（中）", "network": "否（开源库，本地使用）", "deploy": "⭐⭐⭐（中，需定义角色与任务配置）", "cost": "完全免费开源；企业版提供托管与监控服务"},
+  {"name": "ChatDev", "category": "工作流编排型 Agent 平台", "strength": "虚拟软件公司模拟器，擅长让CEO、CTO、程序员、测试员等AI角色自动协作完成从需求到代码的全流程，适合快速原型开发与教学演示。", "difficulty": "⭐⭐⭐（中）", "network": "否（开源库，本地使用）", "deploy": "⭐⭐⭐⭐（高，需配置多角色与通信协议）", "cost": "完全免费开源"},
+  {"name": "minimax code", "category": "AI 编程 IDE/编辑器", "strength": "MiniMax 出品的全能型 AI 编程 Agent。擅长从需求拆解、方案设计到代码实现、调试修复的全流程,不只能写代码,还能做项目规划、文档撰写、联网调研、长任务拆解(自带 producer + verifier 团队模式)。一句话:把一个想法从「想到」带到「做到」,中间全包。", "difficulty": "⭐⭐⭐（中）。需配 API Key,但能免费起步;对话式交互,跟它说话就行,不用学复杂命令", "network": "❌ 不需要。MiniMax 国内服务可直连", "deploy": "🟢 零部署。云端服务,直接网页/IM/IDE 用;支持本地化部署(企业版)", "cost": "按 token 计费,新用户有免费额度;Pro 订阅性价比高,具体看 MiniMax 定价页"},
+  {"name": "Cursor", "category": "AI 编程 IDE/编辑器", "strength": "全项目上下文理解与多文件协同修改。它最懂\"改一个功能要动哪几个文件\"，支持在编辑器内直接运行终端命令并自动修复报错，是目前 Agent 化最彻底的 IDE。", "difficulty": "⭐⭐（极低，VS Code 用户无缝迁移）", "network": "是（核心模型依赖海外节点）", "deploy": "零部署，下载即用", "cost": "免费版（2000次补全/月）；Pro 20/月；Business 40/月"},
+  {"name": "Trae (字节)", "category": "AI 编程 IDE/编辑器", "strength": "国内最接近 Cursor 体验的独立 IDE。内置双模型切换，擅长中文需求转代码、UI 界面生成及国内技术栈（如 Uni-app、Vue）的上下文补全，网络延迟极低。", "difficulty": "⭐⭐（VS Code 内核，迁移成本低）", "network": "否（国内直连，速度极快）", "deploy": "零部署，官网下载", "cost": "当前完全免费（含高级模型额度）"},
+  {"name": "豆包 MarsCode", "category": "AI 编程 IDE/编辑器", "strength": "字节跳动出品，插件形态。擅长代码解释、单元测试生成及国内云原生/中间件场景的辅助，对中文注释和文档的生成质量极高。", "difficulty": "⭐⭐⭐（需安装插件，配置简单）", "network": "否", "deploy": "IDE 插件安装，一键启用", "cost": "个人版免费；企业版按席位订阅"},
+  {"name": "通义灵码 (Lingma)", "category": "AI 编程 IDE/编辑器", "strength": "阿里出品，插件形态。擅长 Java/Go 等后端语言及阿里云生态代码生成，具备极强的企业级代码规范遵循能力，支持私有代码库索引。", "difficulty": "⭐⭐⭐（主流 IDE 插件全覆盖）", "network": "否", "deploy": "插件市场搜索安装，登录即走", "cost": "个人版免费；企业标准版/专属版按席位收费"},
+  {"name": "腾讯云 CodeBuddy", "category": "AI 编程 IDE/编辑器", "strength": "腾讯出品，插件形态。擅长 Go/Python 及腾讯云组件配置代码生成，在小程序、游戏开发及 C++ 底层优化场景有专项优化。", "difficulty": "⭐⭐⭐", "network": "否", "deploy": "插件安装，微信/腾讯云账号登录", "cost": "个人版免费；企业版按需定价"},
+  {"name": "文心快码 Comate", "category": "AI 编程 IDE/编辑器", "strength": "百度出品，插件形态。擅长结合百度搜索生态的代码生成，对中文自然语言转复杂逻辑代码、API 文档自动生成表现优异，支持 IDE 内直接对话。", "difficulty": "⭐⭐⭐", "network": "否", "deploy": "插件安装，百度账号登录", "cost": "个人版免费；企业版按席位订阅"},
+  {"name": "CodeGeeX", "category": "AI 编程 IDE/编辑器", "strength": "智谱 AI 出品，插件形态。主打轻量、极速补全，不卡顿。擅长多语言翻译、代码注释生成，对国产硬件/操作系统适配代码有专项支持。", "difficulty": "⭐⭐（极简配置）", "network": "否", "deploy": "插件安装，手机号登录", "cost": "个人版免费；企业版按席位收费"},
+  {"name": "GitHub Copilot", "category": "AI 编程 IDE/编辑器", "strength": "行业标杆，插件形态。擅长通用代码补全、PR 描述生成及 GitHub 生态联动。2026 版已支持 Agent 模式，可自主执行多步任务，但国内连接稳定性仍一般。", "difficulty": "⭐⭐", "network": "是（或需配置代理）", "deploy": "插件安装，GitHub 账号授权", "cost": "Free（2000次补全）；Individual 10/月；Business 19/月；Enterprise $39/月"},
+  {"name": "Windsurf (Codeium)", "category": "AI 编程 IDE/编辑器", "strength": "主打\"流式协作\"体验。擅长在补全时自动感知你的下一步意图，支持 Flows 模式，可自动串联终端、文件编辑与搜索，交互极其丝滑。", "difficulty": "⭐⭐（VS Code 分支，迁移简单）", "network": "是", "deploy": "下载独立客户端", "cost": "Free（基础补全）；Pro 15/月；Teams 30/月"},
+  {"name": "Tabnine", "category": "AI 编程 IDE/编辑器", "strength": "主打隐私与本地化。擅长在断网或私有云环境下提供高质量补全，支持本地部署小模型，适合对代码安全有极致要求的金融/政企团队。", "difficulty": "⭐⭐⭐", "network": "否（本地版）/ 是（云版）", "deploy": "本地版需配置服务器/容器，云版插件安装", "cost": "Dev 免费；Enterprise 按席位/本地部署报价"},
+  {"name": "Amazon Q Developer", "category": "AI 编程 IDE/编辑器", "strength": "AWS 深度集成。擅长 AWS 服务代码生成、基础设施即代码（IaC）编写及 Java/.NET 遗留代码现代化迁移，是 AWS 开发者的首选。", "difficulty": "⭐⭐⭐", "network": "是", "deploy": "IDE 插件安装，AWS Builder ID 登录", "cost": "Free Tier；Pro $19/用户/月"},
+  {"name": "JetBrains AI Assistant", "category": "AI 编程 IDE/编辑器", "strength": "原生融合 IDE 能力。擅长利用 IDEA/PyCharm 的类型推断、重构引擎进行精准补全，在 Java/Kotlin 复杂重构、调试建议方面远超通用插件。", "difficulty": "⭐（内置功能，开箱即用）", "network": "是（或需配置 JetBrains 代理）", "deploy": "IDE 设置中一键开启", "cost": "包含在 All Products Pack 订阅中；单独订阅 $10/月"},
+  {"name": "Sourcegraph Cody", "category": "AI 编程 IDE/编辑器", "strength": "超大仓库上下文。擅长在百万行级代码库中精准定位引用、理解跨模块依赖，解决\"AI 不懂老代码\"的痛点，适合大型遗留系统维护。", "difficulty": "⭐⭐⭐", "network": "是", "deploy": "插件安装，Sourcegraph 账号连接", "cost": "Free（个人）；Enterprise 按代码量/席位报价"},
+  {"name": "Fitten Code", "category": "AI 编程 IDE/编辑器", "strength": "国产轻量极速插件。主打低延迟补全与中文交互，擅长快速生成样板代码、正则表达式及 SQL，对老旧硬件/低配开发机极其友好。", "difficulty": "⭐⭐", "network": "否", "deploy": "插件市场安装，手机号登录", "cost": "个人版免费；企业版按席位收费"},
+  {"name": "OpenCode", "category": "AI 编程 IDE/编辑器", "strength": "开源终端 AI 助手。擅长在命令行中直接调用 LLM 进行代码解释、Git 提交信息生成及 Shell 脚本编写，不依赖 GUI，极客首选。", "difficulty": "⭐⭐⭐⭐（需熟悉终端操作）", "network": "取决于配置的 API Key（支持本地模型则无需）", "deploy": "go install 或下载二进制，配置 API", "cost": "开源免费（仅承担 API 调用费或本地算力）"},
+  {"name": "Claude Code", "category": "命令行/终端 AI 助手", "strength": "在终端里直接跟 AI 对话，让它读整个项目、改代码、跑测试、修 Bug，甚至帮你写 Git 提交信息。", "difficulty": "⭐⭐（极低，装好 Node.js 一行命令即可启动）", "network": "是（需访问 Anthropic API）", "deploy": "低（本地运行，无需额外服务）", "cost": "按 Token 计费，Pro 订阅 $20/月含一定额度，超出按量付费"},
+  {"name": "Plandex", "category": "命令行/终端 AI 助手", "strength": "专为复杂工程任务设计，能拆解需求、规划步骤、自动执行多文件修改，像有个 AI 项目经理在终端里帮你干活。", "difficulty": "⭐⭐⭐（需理解其\"计划-执行\"模型，有学习曲线）", "network": "是（支持 OpenAI/Anthropic/本地模型）", "deploy": "中（需配置模型后端，支持本地 Ollama）", "cost": "开源免费，模型费用自付；企业版另议"},
+  {"name": "Warp Code", "category": "命令行/终端 AI 助手", "strength": "把 AI 深度嵌入终端本身，支持自然语言查命令、解释输出、自动补全历史，还能一键把对话变成可复用脚本。", "difficulty": "⭐⭐（Warp 终端用户无缝切换，其他终端需适配）", "network": "部分功能需要（核心 AI 依赖云端，本地模式可选）", "deploy": "低（Warp 终端内置，独立 CLI 工具轻量）", "cost": "Warp 终端免费；AI 功能需订阅 $10/月"},
+  {"name": "iFlow CLI", "category": "命令行/终端 AI 助手", "strength": "国产开源终端助手，专注中文交互与本地模型支持。擅长快速生成 Shell 脚本、Docker 命令及 Kubernetes 配置，对国内开发者友好。", "difficulty": "⭐⭐⭐（需配置本地模型或 API）", "network": "否（支持本地 Ollama/Qwen）", "deploy": "中（需安装 Python/Go 环境）", "cost": "完全开源免费"}
+];
+
+
+
+
+var SELECTION_ADVICE = {
+  "core_logic": [
+    "场景匹配度:是内容生成、客服问答,还是复杂业务逻辑处理?",
+    "数据合规性:国内业务首选国产模型底座,出海业务关注 GDPR 合规。",
+    "生态连接力:是否支持飞书/钉钉/企微、数据库及内部 API 的无缝调用。",
+    "成本结构:关注 Token 消耗、并发限制及私有化部署的 License 费用。"
+  ],
+  "零代码/低代码 Agent 平台": [
+    "做 Bot/客服/轻量应用 + 国内生态:首选 扣子 (Coze)。",
+    "微信生态(公众号/企微/小程序):首选 腾讯元器。",
+    "电商/阿里云深度集成:首选 阿里百炼。",
+    "企业级 RAG/合规/数据安全:首选 BetterYeah AI 或 蚂蚁数科 Agentar。",
+    "AI 直接生成完整应用(App/Web):首选 秒哒 (Miaoda)。"
+  ],
+  "工作流编排型 Agent 平台": [
+    "非技术用户优先选 Dify 或 Make；自动化集成选 n8n；RAG 知识库选 LlamaIndex；开发者构建复杂 Agent 选 LangChain；多 Agent 协作选 CrewAI(易上手)或 AutoGen(更灵活)。"
+  ],
+  "AI 编程 IDE/编辑器": [
+    "国内开发者/追求性价比:首选 Trae 或 通义灵码。",
+    "全栈/Agent 重度用户:首选 Cursor(需解决网络问题)。",
+    "Java/企业级重构:首选 JetBrains AI Assistant。",
+    "超大仓库/遗留系统:首选 Sourcegraph Cody。",
+    "隐私敏感/私有化:首选 Tabnine 或 OpenCode + 本地模型。",
+    "从需求到上线全包、还要能联网调研/做规划/调度多工具:选 minimax code(MiniMax 出品的全能 Agent)。"
+  ],
+  "命令行/终端 AI 助手": [
+    "终端里直接跟 AI 对话修代码:首选 Claude Code。",
+    "复杂工程任务自动拆解执行:首选 Plandex。",
+    "终端本身深度嵌入 AI(查命令/补全):选 Warp Code。",
+    "国产/中文交互/本地模型:首选 iFlow CLI。"
+  ],
+  "appendix": [
+    {"type": "零代码平台", "tools": "扣子、腾讯元器、秒哒", "audience": "产品经理、运营、小白", "difficulty": "⭐⭐⭐⭐⭐", "network": "无需", "cost": "免费-低"},
+    {"type": "工作流编排", "tools": "Dify、n8n、LangChain", "audience": "开发者、技术团队", "difficulty": "⭐⭐⭐", "network": "部分需要", "cost": "免费-中"},
+    {"type": "AI IDE", "tools": "Cursor、Trae、通义灵码", "audience": "程序员、开发者", "difficulty": "⭐⭐⭐⭐", "network": "部分需要", "cost": "免费-中"},
+    {"type": "命令行助手", "tools": "Claude Code、Plandex", "audience": "高级开发者、极客", "difficulty": "⭐⭐", "network": "需要", "cost": "中-高"}
+  ]
+};
+
+// ==================== 节点树（演示版用）====================
+var NODES = {
+  // ====== Step 1：破冰与用户画像 ======
+  s1: {
+    step: 'Step 1：破冰与用户画像（确定基调）',
+    agent: '欢迎来到 Vibe Coding（氛围编程）！我是你的私人教练，陪你把脑子里的想法真正做出来。在开始之前，我想先了解一下你的背景，这样我能为你提供最合适的协助。',
+    question: '你目前对编程或 AI 辅助开发的熟悉程度是？',
+    chips: [
+      {l: '🌱 <b>纯小白</b>：没写过代码，对编程几乎不了解', n: 's2', set: {background: '纯小白'}},
+      {l: '🌿 <b>有基础</b>：懂点编程，但没试过纯自然语言写应用', n: 's2', set: {background: '有基础'}},
+      {l: '🌳 <b>专业人士</b>：熟悉主流技术栈，想用 AI 提升效率', n: 's2', set: {background: '专业人士'}},
+      {l: '🤖 <b>AI 极客</b>：主要做 AI 落地、Agent 开发或 RAG 等', n: 's2', set: {background: 'AI 极客'}}
+    ]
+  },
+
+  // ====== Step 2：明确核心目的 ======
+  s2: {
+    step: 'Step 2：明确核心目的（确定边界）',
+    agent: '太棒了，我已经记住你的背景啦！那么这次 Vibe Coding，你最想实现什么目标呢？',
+    question: '这次 Vibe Coding，你最想实现什么目标？',
+    chips: [
+      {l: '✨ <b>兴趣与探索</b>：做个小玩具、个人博客或小游戏玩玩', n: 's3', set: {purpose: '兴趣与探索'}},
+      {l: '💼 <b>求职与作品集</b>：做个能写进简历的 Demo，证明能力', n: 's3', set: {purpose: '求职与作品集'}},
+      {l: '🛠️ <b>解决个人痛点</b>：做个工具解决自己或身边的麻烦事', n: 's3', set: {purpose: '解决个人痛点'}},
+      {l: '🚀 <b>商业/业务落地</b>：帮公司做自动化、SaaS 原型或 AI 接入', n: 's3', set: {purpose: '商业/业务落地'}}
+    ]
+  },
+
+  // ====== Step 3：挖掘具体痛点（核心步骤）======
+  s3: {
+    step: 'Step 3：挖掘具体痛点（把"麻烦"变成"需求"）',
+    agent: function(p){
+      return '收到！咱们别急着定义它是啥工具，先聊聊具体的痛点。\n\n' +
+        (p.purpose ? '你刚选了「' + p.purpose + '」，' : '') +
+        '在你想做的方向里，<b>有什么事情让你觉得特别繁琐、重复，或者特别想找个帮手分担的？</b>\n\n哪怕只是一个模糊的念头，比如"每次XX都头大"，也可以告诉我哦！';
+    },
+    question: '你有什么具体的痛点想说吗？',
+    chips: [
+      {l: '🤯 <b>脑子有点乱</b>，不知道从何说起...', n: 's3_confused'},
+      {l: '💡 <b>我有个大概想法</b>，试着描述一下', n: 's3_idea'},
+      {l: '👀 <b>看看别人都解决了什么痛点？</b>', n: 's3_examples'}
+    ]
+  },
+  s3_confused: {
+    step: 'Step 3：剥洋葱追问（最核心的细节）',
+    agent: '完全没关系！咱们不急，先聊一个最核心的：你选的方向里，<b>你最近最常做的、觉得特别繁琐的事情是什么？</b>\n\n就一个动作就行：哪怕只是"每次都要手动复制粘贴"这种小事，也算。',
+    question: '最近让你最烦的是哪一步？',
+    chips: [
+      {l: '⏰ <b>重复操作太累</b>：每周都要做同样的事', n: 's3_input'},
+      {l: '🔍 <b>找信息太慢</b>：搜资料、整理、归纳', n: 's3_input'},
+      {l: '📝 <b>写东西头疼</b>：周报/邮件/文案', n: 's3_input'},
+      {l: '✍️ <b>我直接打字描述</b>', n: 's3_input'}
+    ]
+  },
+  s3_idea: {
+    step: 'Step 3：痛点细化',
+    agent: '好嘞！那你说说看，你心里大概想做什么？哪怕很粗糙都行，我帮你细化～',
+    question: '你的大概想法是？',
+    chips: [
+      {l: '✍️ <b>我直接打字描述</b>', n: 's3_input'}
+    ]
+  },
+  s3_examples: {
+    step: 'Step 3：挖掘具体痛点（看别人案例）',
+    agent: '⏳ 正在为你检索全网最新的小白友好型方案...（检索小红书、即刻、Product Hunt、少数派）',
+    question: '看完后，哪个最接近你想要的？',
+    chips: [
+      {l: '🚀 <b>方案A</b> | 1.看示例 -> 2.挑模板 -> 3.改造成自己的', n: 's3_plans'},
+      {l: '🛠 <b>方案B</b> | 1.看原理 -> 2.自己设计 -> 3.从 0 写', n: 's3_plans'},
+      {l: '👀 <b>再多看几个</b>', n: 's3_examples'},
+      {l: '✍️ <b>我直接打字说我的想法</b>', n: 's3_input'}
+    ]
+  },
+  s3_input: {
+    step: 'Step 3：痛点收集（自由输入）',
+    agent: '好，我在听 👂 把你心里那个模糊的、烦人的、想解决的事，<b>用你自己的话说出来</b>。哪怕很乱也行，我帮你梳理。\n\n<b>怎么描述效果最好：</b>什么人 + 在做什么 + 哪里卡住了。\n\n<b>示例：</b>我做旅游攻略，每次要在小红书刷 100 条笔记，复制景点名字到 Excel，再去携程查价格。每次要花 2 小时，烦死了。',
+    question: '（在下方输入框打字告诉我）',
+    chips: [
+      {l: '⏭️ <b>我描述完了</b>，给我 2 个工程方案', n: 's3_plans'}
+    ]
+  },
+
+  // ====== 中期：痛点拆解 + 方案生成 ======
+  s3_plans: {
+    step: '中期：痛点拆解 + 方案生成（工程级颗粒度）',
+    agent: function(p){
+      var painText = p.pain || '你刚才说的痛点';
+      return '我把你说的痛点翻译成了 <b>2 个具体的工程方案</b>。每个方案都包含：怎么用 + 背后逻辑 + 落地条件 + 3 步走。\n\n' +
+        '<b>关于你的痛点：</b>' + painText + '\n\n' +
+        '你先看看哪个更顺手：';
+    },
+    question: '你想选哪个方案？',
+    chips: [
+      {l: '🚀 <b>方案 A</b>：丢链接/输入触发，自动整理', n: 's3_pick'},
+      {l: '🤖 <b>方案 B</b>：直接告诉 AI 需求，全网搜罗', n: 's3_pick'},
+      {l: '🔍 <b>这两个都不行</b>，联网再调研', n: 's3_research'},
+      {l: '✍️ <b>我直接打字补充</b>', n: 's3_input'}
+    ]
+  },
+  s3_research: {
+    step: '中期：深度调研（联网搜索）',
+    agent: function(p){
+      return '⏳ 正在联网深度调研「' + (p.pain || '你的痛点') + '」的市面 AI 方案...\n\n' +
+        '我会吸收最新做法，重新生成属于你的 <b>方案 A</b> 和 <b>方案 B</b>，绝不照搬别人的做法。';
+    },
+    question: '看完调研后，你倾向哪个？',
+    chips: [
+      {l: '🚀 <b>方案 A</b>（新） | 1.试用 -> 2.改 -> 3.上线', n: 's3_pick'},
+      {l: '🤖 <b>方案 B</b>（新） | 1.试用 -> 2.改 -> 3.上线', n: 's3_pick'},
+      {l: '✍️ <b>我直接打字补充</b>', n: 's3_input'}
+    ]
+  },
+  s3_pick: {
+    step: '中期：方案敲定',
+    agent: function(p){
+      var tool = p.pickedTool || 'AI 工具';
+      return '方案敲定！接下来我要给你生成一份「<b>专属执行清单（Markdown 格式）</b>」,你把它丢给 AI 工具,它就能秒懂,<b>能省 Token、不跑偏</b>。\n\n' +
+        '💡 <b>核心亮点:</b>我直接帮你把「背景+目的+痛点+形态+网络+预算+选定方案」全打包成 Markdown,你贴给 ' + tool + ' 就能开工,<b>省得你再跑去工具里重说一遍</b>。\n\n' +
+        '<b>教练小贴士:</b>什么是 Markdown?它就像一份"AI 专属说明书",排版极其清晰。\n\n' +
+        '先别急,咱们先进 Step 4 确定产品形态,让方案更精准:';
+    },
+    question: '你想选哪种方式来实现这个方案？',
+    chips: [
+      {l: '🔧 <b>先做个简单的 Skill（工具）</b>：固定输入→固定输出', n: 's5', set: {form: 'Skill'}, finalizePlan: 'A'},
+      {l: '🤖 <b>挑战一下，做个 Agent（员工）</b>：能自己拆任务、判断下一步', n: 's5', set: {form: 'Agent'}, finalizePlan: 'B'},
+      {l: '🔀 <b>试试融合体（员工+工具）</b>：复杂场景用', n: 's5', set: {form: '融合体'}, finalizePlan: 'A'},
+      {l: '🤔 <b>还是没概念</b>，给我举个具体的例子吧', n: 's4_examples'}
+    ]
+  },
+
+  // ====== Step 4：确定产品形态 ======
+  s4: {
+    step: 'Step 4：确定产品形态（Skill / Agent / 融合体）',
+    agent: '太棒了！接下来，我们要给这个想法定个"形态"。在 Vibe Coding（用自然语言写代码）里，通常有三种做法：\n\n• <b>Skill（技能插件）</b>：一个固定能力，输入→输出，不自己思考\n• <b>Agent（智能体）</b>：能自己拆任务、调工具、判断下一步的"数字员工"\n• <b>融合体</b>：Skill + Agent 组合，复杂场景用',
+    question: '你想选哪种方式来实现你的想法？',
+    chips: [
+      {l: '🔧 <b>先做个简单的 Skill（工具）</b>', n: 's5', set: {form: 'Skill'}},
+      {l: '🤖 <b>挑战一下，做个 Agent（员工）</b>', n: 's5', set: {form: 'Agent'}},
+      {l: '🔀 <b>试试融合体（员工+工具）</b>', n: 's5', set: {form: '融合体'}},
+      {l: '🤔 <b>还是没概念</b>，给我举个具体的例子吧', n: 's4_examples'}
+    ]
+  },
+  s4_examples: {
+    step: 'Step 4：产品形态（看案例）',
+    agent: '⏳ 正在为你检索三种形态的代表性案例...（Skill / Agent / 融合体）',
+    question: '看完后，哪种形态最适合你？',
+    chips: [
+      {l: '🎯 <b>Skill 案例</b> | 1.看演示 -> 2.复制模板 -> 3.定制', n: 's5', set: {form: 'Skill'}},
+      {l: '🤖 <b>Agent 案例</b> | 1.看架构 -> 2.配工具 -> 3.调提示词', n: 's5', set: {form: 'Agent'}},
+      {l: '🔀 <b>融合体案例</b> | 1.看模块 -> 2.拆组件 -> 3.组装', n: 's5', set: {form: '融合体'}},
+      {l: '✍️ <b>我自己已经想好了</b>', n: 's4'}
+    ]
+  },
+
+  // ====== Step 5：网络环境 ======
+  s5: {
+    step: 'Step 5：网络环境确认（决定工具池）',
+    agent: '产品形态定好啦！接下来进入选工具环节。因为目前最好用的 AI 编程工具分布在全球各地，所以我得先确认一下你的网络环境。',
+    question: '你目前能够顺畅地访问海外网站（也就是大家常说的"科学上网"）吗？',
+    chips: [
+      {l: '🌍 <b>能，我网络没问题</b>', n: 's6', set: {network: '可科学上网'}},
+      {l: '🇨🇳 <b>不能</b>，我只能用国内直连的工具', n: 's6', set: {network: '国内直连'}}
+    ]
+  },
+
+  // ====== Step 6：预算 ======
+  s6: {
+    step: 'Step 6：预算评估（决定工具档次）',
+    agent: '收到！我已经帮你圈定好工具范围啦。最后一个关键问题：你每个月大概打算在这个项目上投入多少预算呢？（不用有压力，很多工具都有免费额度哦！）',
+    question: '你的预算是？',
+    chips: [
+      {l: '💰 <b>0 ~ 50 元/月</b>：先白嫖或低成本试水', n: 's7', set: {budget: '0-50'}},
+      {l: '💵 <b>50 ~ 150 元/月</b>：愿意为主流好用工具付费', n: 's7', set: {budget: '50-150'}},
+      {l: '💎 <b>150 元以上/月</b>：不差钱，追求极致体验', n: 's7', set: {budget: '150+'}}
+    ]
+  },
+
+  // ====== Step 7：工具精准推荐引擎 ======
+  s7: {
+    step: 'Step 7：工具精准推荐引擎',
+    agent: function(p){
+      var cond = [
+        '【' + (p.background || '?') + '】',
+        '【' + (p.purpose || '?') + '】',
+        '【' + (p.network || '?') + '】',
+        '【预算 ' + (p.budget || '?') + ' 元/月】',
+        '【' + (p.form || '?') + '】'
+      ].join(' · ');
+
+      // 从 36 工具 RAG 里挑出 3 个，并展示完整信息
+      var recs = recommendTools(p);
+      var msg = '⏳ 基于你的画像 ' + cond + '，从 <b>36 个主流工具 RAG</b> 库中匹配 3 个最合适的：\n\n';
+      recs.forEach(function(r, i){
+        var emoji = i === 0 ? '🏆' : (i === 1 ? '🥈' : '🥉');
+        var tag = i === 0 ? '教练首推' : '备选 ' + i;
+        msg += emoji + ' <b>' + tag + '：' + r.name + '</b> [' + (r.full.category || '') + ']\n';
+        msg += '   <b>擅长：</b>' + (r.full.strength || '').slice(0, 80) + '\n';
+        if (r.full.difficulty) msg += '   <b>门槛：</b>' + r.full.difficulty + '\n';
+        if (r.full.network) msg += '   <b>网络：</b>' + r.full.network + '\n';
+        if (r.full.cost) msg += '   <b>费用：</b>' + r.full.cost + '\n';
+        msg += '\n';
+      });
+      msg += '你选哪个？';
+      return msg;
+    },
+    question: '选哪个工具？',
+    chips: function(p){
+      var recs = recommendTools(p);
+      var chips = recs.map(function(r, i){
+        var emoji = i === 0 ? '🏆' : (i === 1 ? '🥈' : '🥉');
+        return {l: emoji + ' <b>' + r.name + '</b> | 1.去官网 -> 2.注册 -> 3.跑通 demo', n: 's8', set: {pickedTool: r.name}};
+      });
+      chips.push({l: '🔄 <b>我有别的想法</b>，想用 [其他工具]', n: 's7_custom'});
+      return chips;
+    }
+  },
+  s7_custom: {
+    step: 'Step 7：用户自带工具',
+    agent: '好，告诉我你想用哪个工具？哪怕你只听过名字也告诉我，我帮你客观分析下它跟你的画像是否匹配：',
+    question: '你想用什么工具？',
+    chips: [
+      {l: '✍️ <b>我直接在输入框说</b>（比如：我想用 Cursor）', n: 's8'}
+    ]
+  },
+
+  // ====== Step 8：获取工具 + 避坑 ======
+  s8: {
+    step: 'Step 8：获取工具与"避坑"指南',
+    agent: function(p){
+      return '太棒了！工具敲定啦（<b>' + (p.pickedTool || '你选的工具') + '</b>），咱们现在就去把它"领"回家！\n\n' +
+        '<b>教练避坑提醒：</b>作为 ' + (p.background || '你') + '，第一次用 ' + (p.pickedTool || '新工具') + ' 最容易踩的坑是——别一上来就开 1 个月的会员。先用免费额度跑通 demo，确认真的能用再付费。';
+    },
+    question: '下一步做什么？',
+    chips: [
+      {l: '📥 <b>获取官方链接与注册教程</b>', n: 's8_get'},
+      {l: '🆓 <b>我想知道有没有免费/白嫖的方法</b>', n: 's8_free'},
+      {l: '🆘 <b>注册卡住了</b>，帮我看看怎么解决', n: 's8_help'},
+      {l: '✅ <b>我已经搞定了</b>，直接进入下一步！', n: 'final'}
+    ]
+  },
+  s8_get: {
+    step: 'Step 8：获取工具',
+    agent: '好！去这个官方地址（演示版通用教程）：\n\n🔗 <b>打开「' + (profile.pickedTool || '工具') + '」的官网</b>\n\n<b>注册流程：</b>\n1. 打开官网，点"注册"（手机号/微信）\n2. 完成实名（国内工具必须）\n3. 充值（¥1 起就够用）\n4. 创建 API Key\n5. <b>复制 key（只显示一次！）</b>\n\n⚠️ <b>避坑：</b>API Key 复制后立刻存到密码管理器里，不要只放在桌面文本里。',
+    question: '继续？',
+    chips: [
+      {l: '🆓 <b>想知道白嫖方法</b>', n: 's8_free'},
+      {l: '🆘 <b>卡住了帮我看</b>', n: 's8_help'},
+      {l: '✅ <b>搞定了</b>，下一步！', n: 'final'}
+    ]
+  },
+  s8_free: {
+    step: 'Step 8：白嫖方案',
+    agent: '好消息！大多数 AI 编程工具新用户都有 <b>免费额度</b>，足够试用：\n\n• 注册送体验金 / 免费 token\n• 模型按 token 计费，跑通 demo 一天几毛到几块\n• 用完充值（最低 ¥1）\n\n💡 <b>教练贴心建议：</b>作为 ' + (profile.background || '你') + '，先用免费额度把 demo 跑通 1 次，确认思路 OK 再充值，能少走 90% 的弯路。',
+    question: '继续？',
+    chips: [
+      {l: '📥 <b>获取注册教程</b>', n: 's8_get'},
+      {l: '✅ <b>已经搞定了</b>，下一步！', n: 'final'}
+    ]
+  },
+  s8_help: {
+    step: 'Step 8：卡住了？',
+    agent: '别急！常见问题 + 解法：\n\n• <b>手机号收不到验证码</b> → 换微信扫码注册\n• <b>实名失败</b> → 检查身份证格式（末尾 X 必须大写）\n• <b>充值失败</b> → 换支付方式（微信/支付宝）\n• <b>API key 找不到</b> → 平台 → 「API Keys」→ 创建（注意只显示一次）',
+    question: '具体是哪个问题？',
+    chips: [
+      {l: '📥 <b>看完整注册教程</b>', n: 's8_get'},
+      {l: '✅ <b>已经搞定了</b>，下一步！', n: 'final'}
+    ]
+  },
+
+  // ====== 中期：仪式感过渡 + 方案书 + Markdown + 落地三选项 ======
+  final: {
+    step: '前期 8 步走完，进入实战陪跑',
+    agent: function(p){
+      var tool = p.pickedTool || '你选的工具';
+      return '🎉 <b>前期 8 步引导全部完成！</b>\n\n' +
+        '你已经有了完整的项目画像 + 产品形态 + 推荐工具 + 选定方案。\n\n' +
+        '从这一秒开始,我们正式进入 <b>中期:Vibe Coding 实战陪跑</b> 阶段。\n\n' +
+        '📋 <b>你接下来要做的事(我帮你省掉一大半):</b>\n' +
+        '1. 打开 <b>' + tool + '</b>\n' +
+        '2. 把右边的 <b>Markdown 执行清单</b> 复制粘贴进去\n' +
+        '3. AI 直接开工,你不用再重新描述一遍需求\n\n' +
+        '💡 <b>这是这个 Coach 的核心亮点:</b>别的教练只给你建议,让你自己跑去 ' + tool + ' 里重新写一遍需求;\n' +
+        '我直接帮你把「背景+目的+痛点+形态+网络+预算+选定方案」打包成一份 Markdown,\n' +
+        '你贴给 ' + tool + ' 就能开工,<b>省至少 20 分钟重复沟通</b>。\n\n' +
+        '👀 <b>你瞄一眼右边这份方案书,</b>觉得工作流 OK 的话,我现在就帮你生成 Markdown,直接贴给 ' + tool + ' 开干?\n\n' +
+        '我给你准备了:\n' +
+        '• 📋 专属方案书(右侧已实时生成)\n' +
+        '• 🛠 <b>Markdown 执行清单</b>(贴给 AI 工具直接开工)\n' +
+        '• 🏠/📢/💰 <b>落地三选项</b>(纯自用 / 作品展示 / 商业落地)';
+    },
+    question: '你看下工作流,要不要我现在直接生成 Markdown?',
+    chips: [
+      {l: '📄 <b>好,现在直接生成 Markdown</b>(贴给工具用)', n: 'final_md'},
+      {l: '🤓 <b>用小白话讲讲这份方案书</b>', n: 'final_simple'},
+      {l: '🚀 <b>我先不急</b>,稍后再说', n: 's1'}
+    ]
+  },
+  final_md: {
+    step: '方案书 + Markdown 执行清单',
+    agent: '见下方方案书区域 ↑\n\n<b>下一步：</b>复制右边的 <code>Markdown 块</code>，粘贴到 AI 工具里，立即能开工。',
+    question: '接下来怎么走？',
+    chips: [
+      {l: '🏠 <b>纯自用</b>：保存到本地 / GitHub Pages / Vercel', n: 'final_use'},
+      {l: '📢 <b>作品展示</b>：发朋友圈/小红书/即刻', n: 'final_show'},
+      {l: '💰 <b>商业落地</b>：部署服务 / 收钱', n: 'final_biz'}
+    ]
+  },
+  final_simple: {
+    step: '小白版方案书',
+    agent: '好嘞！用大白话讲讲：\n\n你想做的这个事，<b>AI 工具能帮你</b>。\n\n• 不用写代码（或写很少）\n• 跟 AI 说"我要做 XX"就行\n• 工具：就用 <b>' + (profile.pickedTool || '我推荐的那个') + '</b>\n• 形态：<b>' + (profile.form || '技能插件') + '</b>\n• 工作流：用户输入 → AI 处理 → 输出\n\n差不多 30 分钟能跑通第一版。卡了再来找我～',
+    question: '接下来？',
+    chips: [
+      {l: '📄 <b>看正式版 + Markdown</b>', n: 'final_md'},
+      {l: '🏠 <b>纯自用</b>', n: 'final_use'},
+      {l: '🔄 <b>重新规划</b>', n: 's1'}
+    ]
+  },
+  final_use: {
+    step: '纯自用（本地永久化）',
+    agent: '好！<b>纯自用的落地：</b>\n\n1. 在工具里把代码保存为本地文件（如 <code>index.html</code>）\n2. 或部署到 <b>GitHub Pages</b>（免费、永久）\n3. 或部署到 <b>Vercel / Netlify</b>（一键、免费）\n\n<b>痛点：</b>AI 生成的临时网页链接可能会失效。\n<b>解法：</b>本地文件永远在，不用担心链接挂掉。',
+    question: '搞定？',
+    chips: [
+      {l: '✅ <b>已搞定</b>，方案书就这样', n: 's1'},
+      {l: '📢 <b>想去作品展示</b>', n: 'final_show'},
+      {l: '💰 <b>想去商业落地</b>', n: 'final_biz'},
+      {l: '🆘 <b>需要更多帮助</b>', n: 'final'}
+    ]
+  },
+  final_show: {
+    step: '作品展示（获取社交反馈）',
+    agent: '想发朋友圈/小红书炫耀？<b>推荐路径：</b>\n\n1. 录 1-2 分钟 <b>Demo 视频</b>（Loom / 剪映）\n2. 部署到 <b>Netlify</b> 生成短链接\n3. 标题模板：「我用 AI 做了个 XX，3 分钟搞定 YY」\n4. 发小红书 / B站 / 朋友圈 / 即刻\n\n<b>痛点：</b>做好了想发炫耀但不知道怎么弄。\n<b>解法：</b>让别人点链接就能用！',
+    question: '搞定？',
+    chips: [
+      {l: '✅ <b>已搞定</b>', n: 's1'},
+      {l: '🏠 <b>想去纯自用</b>', n: 'final_use'},
+      {l: '💰 <b>想去商业落地</b>', n: 'final_biz'}
+    ]
+  },
+  final_biz: {
+    step: '商业落地（变现与部署）',
+    agent: '<b>商业化要做的：</b>\n\n1. 服务器部署（<b>Vercel</b> / 阿里云 / 腾讯云）\n2. 域名绑定（wanwang.aliyun.com）\n3. 用户系统（登录 / 支付）\n4. 隐私协议 + 用户协议\n5. 客服 + 反馈渠道\n\n<b>痛点：</b>想把这个工具卖给别人，或者给公司用。\n<b>教练贴心建议：</b>MVP 跑通后再来聊这些。先去把基础版做出来～',
+    question: '搞定？',
+    chips: [
+      {l: '✅ <b>已搞定</b>', n: 's1'},
+      {l: '🏠 <b>想去纯自用</b>', n: 'final_use'},
+      {l: '📢 <b>想去作品展示</b>', n: 'final_show'}
+    ]
+  }
+};
+
+// ==================== 工具推荐引擎（演示版，按画像动态）====================
+// 工具池设计原则：标记 'universal' 的工具在两个池都出现（Coze/阿里百炼等国内工具在海外也能用）
+function recommendTools(p) {
+  var bg = p.background || '';
+  var purpose = p.purpose || '';
+  var network = p.network || '';
+  var budget = p.budget || '';
+  var form = p.form || '';
+
+  // 从 36 工具 RAG 中筛。根据网络分网，预算 + 形态进一步过滤。
+  // 1. 按网络过滤
+  var pool = TOOL_RAG.filter(function(t) {
+    var net = (t.network || '').indexOf('不需要') >= 0 ? '国内直连' :
+              (t.network || '').indexOf('需要') >= 0 ? '可科学上网' : null;
+    if (network === '国内直连') return net === '国内直连' || net === null;
+    if (network === '可科学上网') return true;  // 都能用
+    return true;  // 未填网络 -> 全展示
+  });
+
+  // 2. 按形态 / 目的关联打分
+  function scoreTool(t) {
+    var score = 0;
+    var name = t.name;
+    var cat = t.category;
+    var strength = t.strength || '';
+    var cost = t.cost || '';
+    var difficulty = t.difficulty || '';
+
+    // 背景分数
+    if (bg === '纯小白') {
+      if (difficulty.indexOf('⭐⭐⭐⭐⭐') >= 0) score += 3;  // 极低门槛
+      if (strength.indexOf('拖拽') >= 0 || strength.indexOf('零代码') >= 0 || strength.indexOf('对话') >= 0) score += 2;
+      if (name.indexOf('Coze') >= 0 || name.indexOf('扣子') >= 0 || name.indexOf('秒哒') >= 0) score += 4;
+      if (name.indexOf('MarsCode') >= 0 || name.indexOf('Fitten') >= 0) score += 1;
+    } else if (bg === '有基础') {
+      if (difficulty.indexOf('⭐⭐⭐⭐') >= 0) score += 2;
+      if (cat.indexOf('工作流') >= 0 || cat.indexOf('IDE') >= 0) score += 2;
+    } else if (bg === '专业人士') {
+      if (cat.indexOf('IDE') >= 0 || cat.indexOf('CLI') >= 0) score += 3;
+      if (name === 'Cursor' || name === 'Claude Code' || name.indexOf('JetBrains') >= 0) score += 2;
+    } else if (bg === 'AI 极客') {
+      if (cat.indexOf('工作流') >= 0) score += 3;
+      if (name === 'LangChain' || name === 'AutoGen' || name === 'CrewAI' || name === 'Dify' || name === 'LlamaIndex') score += 3;
+    }
+
+    // 目的分数
+    if (purpose === '解决个人痛点') {
+      if (cost.indexOf('免费') >= 0) score += 2;
+      if (cat.indexOf('零代码') >= 0) score += 2;
+    } else if (purpose === '求职与作品集') {
+      if (cat.indexOf('IDE') >= 0) score += 2;
+      if (strength.indexOf('多语言') >= 0 || strength.indexOf('全项目') >= 0) score += 1;
+    } else if (purpose === '兴趣与探索') {
+      if (cost.indexOf('免费') >= 0) score += 3;
+    } else if (purpose === '商业/业务落地') {
+      if (strength.indexOf('企业') >= 0 || strength.indexOf('SaaS') >= 0) score += 2;
+      if (name.indexOf('百炼') >= 0 || name === 'Dify' || name === 'BetterYeah AI') score += 2;
+    }
+
+    // 预算分数
+    if (budget === '0-50') {
+      if (cost.indexOf('免费') >= 0) score += 5;
+      if (cost.indexOf('按Token') >= 0) score -= 2;  // 消耗型有风险
+      if (cost.indexOf('个人开发者免费') >= 0) score += 3;
+    } else if (budget === '50-150') {
+      if (cost.indexOf('按Token') >= 0) score += 1;
+    } else if (budget === '150+') {
+      if (strength.indexOf('企业') >= 0) score += 2;
+      if (cost.indexOf('企业版') >= 0 || cost.indexOf('付费') >= 0) score += 1;
+    }
+
+    // 形态分数
+    if (form === 'Agent') {
+      if (cat.indexOf('工作流') >= 0 || cat.indexOf('零代码') >= 0) score += 3;
+      if (strength.indexOf('Agent') >= 0) score += 1;
+    } else if (form === 'Skill') {
+      if (cat.indexOf('零代码') >= 0 && strength.indexOf('工作流') >= 0) score += 2;
+      if (cat.indexOf('IDE') >= 0) score += 1;
+    } else if (form === '融合体') {
+      if (cat.indexOf('工作流') >= 0) score += 2;
+    }
+
+    return score;
+  }
+
+  // 打分排序
+  var scored = pool.map(function(t){ return {t: t, s: scoreTool(t)}; })
+    .sort(function(a, b){ return b.s - a.s; });
+
+  // 取前 3，每项附加 why（用 RAG 的 strength 字段截短）
+  return scored.slice(0, 3).map(function(x) {
+    var s = x.t.strength || '';
+    var why = s.length > 80 ? s.slice(0, 80) + '…' : s;
+    return {name: x.t.name, why: why, full: x.t};
+  });
+}
+
+// ==================== 方案书渲染（动态注入用户画像）====================
+function renderPlan() {
+  var p = profile;
+  var planA = p.planA || {
+    title: '方案 A：丢链接/输入触发，自动整理',
+    workflow: [
+      '用户粘贴链接或输入关键词',
+      '工具自动调用 AI 提取关键信息',
+      '输出结构化结果（表格 / 列表）'
+    ]
+  };
+  var planB = p.planB || {
+    title: '方案 B：告诉 AI 需求，全网搜罗',
+    workflow: [
+      '用户输入需求（如"大理 3 天攻略"）',
+      '工具联网搜索 + AI 整理',
+      '输出完整方案 + 链接'
+    ]
+  };
+
+  var html = '<div class="plan-doc">';
+  html += '<div class="meta">';
+  html += '👤 <b>用户画像：</b>' + (p.background || '-') + ' · ' + (p.purpose || '-') + ' · ' + (p.network || '-') + ' · 预算 ' + (p.budget || '-') + ' 元/月<br>';
+  html += '🧩 <b>产品形态：</b>' + (p.form || '-') + ' &nbsp; 🛠 <b>推荐工具：</b>' + (p.pickedTool || 'Step 7 待选') + '<br>';
+  html += '🎯 <b>核心痛点：</b>' + (p.pain || 'Step 3 收集中') + '<br>';
+  html += '📅 <b>生成时间：</b>' + new Date().toLocaleString('zh-CN');
+  html += '</div>';
+
+  // ==================== 🧠 Coach 实时记忆（一眼看到 Coach 现在知道什么）====================
+  html += '<h2>🧠 Coach 实时记忆</h2>';
+  html += '<div class="memory-status">';
+  var memoryItems = [
+    {k: '背景', v: p.background, step: 's1'},
+    {k: '目的', v: p.purpose, step: 's2'},
+    {k: '痛点', v: p.pain ? p.pain.slice(0, 24) + (p.pain.length > 24 ? '…' : '') : null, step: 's3'},
+    {k: '形态', v: p.form, step: 's4'},
+    {k: '网络', v: p.network, step: 's5'},
+    {k: '预算', v: p.budget ? p.budget + ' 元/月' : null, step: 's6'},
+    {k: '工具', v: p.pickedTool, step: 's7'},
+    {k: '方案', v: p.pickedPlan ? '方案 ' + p.pickedPlan : null, step: 's3'}
+  ];
+  memoryItems.forEach(function(m) {
+    var confirmed = p.confirmed && p.confirmed[m.step];
+    var statusIcon, statusClass;
+    if (confirmed) { statusIcon = '✓'; statusClass = 'mem-done'; }
+    else if (m.v) { statusIcon = '…'; statusClass = 'mem-pending'; }
+    else { statusIcon = '○'; statusClass = 'mem-empty'; }
+    html += '<div class="mem-row ' + statusClass + '">';
+    html += '<span class="mem-status">' + statusIcon + '</span>';
+    html += '<span class="mem-key">' + m.k + '</span>';
+    html += '<span class="mem-val">' + escapeHtml(m.v || '待定') + '</span>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // ==================== 📜 决策历史时间线（按顺序）====================
+  if (p.history && p.history.length > 0) {
+    html += '<h2>📜 决策历史</h2>';
+    html += '<div class="history-timeline">';
+    p.history.slice(-30).forEach(function(h) {
+      html += '<div class="history-item">';
+      html += '<span class="history-time">' + (h.time || '--:--') + '</span>';
+      html += '<span class="history-step">' + (h.step ? h.step.toUpperCase() : '·') + '</span>';
+      html += '<span class="history-text">' + escapeHtml(h.text || '') + '</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  html += '<h2>📋 1. 项目目的</h2>';
+  html += '<p>' + (p.purpose || '由 Step 2 决定') + '</p>';
+
+  html += '<h2>🧩 2. 产品形态</h2>';
+  html += '<p><b>' + (p.form || '由 Step 4 决定') + '</b>（' + (p.form === 'Skill' ? '固定输入→固定输出' : (p.form === 'Agent' ? '能自己拆任务、判断下一步' : 'Skill + Agent 组合')) + '）</p>';
+
+  html += '<h2>🎯 3. 痛点拆解</h2>';
+  html += '<p>' + (p.pain || '由 Step 3 决定') + '</p>';
+
+  html += '<h2>🛠 4. 推荐工具</h2>';
+  if (p.pickedTool) {
+    html += '<p><b>' + p.pickedTool + '</b>（' + (p.network === '国内直连' ? '国内直连' : '需科学上网') + ' · ' + (p.budget === '0-50' ? '免费' : '付费') + '）</p>';
+  } else {
+    html += '<p>由 Step 7 联网搜索结果决定</p>';
+  }
+
+  html += '<h2>⚙️ 5. 工作流（选定方案）</h2>';
+  if (p.pickedPlan) {
+    var plan = p.pickedPlan === 'A' ? planA : planB;
+    html += '<h3>' + escapeHtml(plan.title) + '</h3>';
+    html += '<ul>';
+    plan.workflow.forEach(function(step, i){
+      html += '<li class="step-li"><span class="step-num">' + (i+1) + '</span><span>' + escapeHtml(step) + '</span></li>';
+    });
+    html += '</ul>';
+  } else {
+    html += '<p>由 Step 3 中期决定（方案 A 或 B）</p>';
+  }
+
+  html += '<h2>🚀 6. 下一步</h2>';
+  html += '<p>把下方的 <code>Markdown 块</code> 贴给 AI 工具，立即能开工。</p>';
+
+  html += '<h2>📦 Markdown 执行清单（贴给 AI 用）</h2>';
+  html += '<pre><code>';
+  html += '# 项目：' + (p.purpose || '你的 Vibe Coding 项目') + '\n\n';
+  html += '## 用户画像\n';
+  html += '- 编程基础：' + (p.background || '?') + '\n';
+  html += '- 网络环境：' + (p.network || '?') + '\n';
+  html += '- 预算：' + (p.budget || '?') + ' 元/月\n\n';
+  html += '## 目标\n';
+  html += (p.pain || '一句话说清要做什么') + '\n\n';
+  html += '## 用户\n';
+  html += '谁会用 + 怎么用（按 Step 3 痛点决定）\n\n';
+  html += '## 产品形态\n';
+  html += (p.form || 'Skill / Agent / 融合体') + '\n\n';
+  html += '## 核心功能\n';
+  html += '- 功能 1：[具体描述，按选定方案]\n';
+  html += '- 功能 2：[具体描述，按选定方案]\n\n';
+  html += '## 技术栈\n';
+  html += '- 工具：' + (p.pickedTool || 'Step 7 选定') + '\n';
+  html += '- 数据源：[如果有，列出具体平台]\n\n';
+  html += '## 工作流\n';
+  if (p.pickedPlan === 'A') {
+    html += '1. 用户触发（粘贴链接 / 输入关键词）\n';
+    html += '2. 系统自动调用 AI 提取关键信息\n';
+    html += '3. 输出结构化结果（表格 / 列表）\n';
+  } else if (p.pickedPlan === 'B') {
+    html += '1. 用户输入需求\n';
+    html += '2. 工具联网搜索 + AI 整理\n';
+    html += '3. 输出完整方案 + 链接\n';
+  } else {
+    html += '1. 用户 [做什么]\n';
+    html += '2. 系统 [处理什么]\n';
+    html += '3. 输出 [什么结果]\n';
+  }
+  html += '</code></pre>';
+
+  html += '<div class="stamp">✅ 8 步引导 + 中期实战陪跑流程已就绪</div>';
+  html += '</div>';
+
+  document.getElementById('prev').innerHTML = html;
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ==================== 顶部实时记忆条（已隐藏，但函数保留为 noop）====================
+function updateMemoryBar() {
+  // 用户要求删除顶部黄条，函数体保留以免调用报错
+}
+
+// ==================== 统一更新接口：profile 变更后调这个 ====================
+// 在所有 profile 突变后调用，依次刷新顶部记忆条 + 右侧方案书
+function refreshMemory() {
+  updateMemoryBar();
+  renderPlan();
+}
+
+// ==================== profile 变更的统一入口 ====================
+// 所有修改 profile 字段的地方都应该走这个函数：保证 history + memory + 方案书都同步更新
+var KEY_TO_STEP = {
+  background: 's1', purpose: 's2', pain: 's3', form: 's4',
+  network: 's5', budget: 's6', pickedTool: 's7', pickedPlan: 's3'
+};
+var KEY_LABEL = {
+  background: '背景', purpose: '目的', pain: '痛点', form: '形态',
+  network: '网络', budget: '预算', pickedTool: '工具', pickedPlan: '方案'
+};
+function setProfile(key, value) {
+  if (profile[key] === value) return;  // 没变就不动
+  // 归一：用户可能说 "Coze" 但 RAG 里是 "扣子 (Coze)"；"cursor" 统一为 "Cursor"
+  if (key === 'pickedTool' && typeof value === 'string') {
+    var v = value.trim();
+    if (v.toLowerCase() === 'coze' || v === '扣子' || v === 'coze (扣子)') value = '扣子 (Coze)';
+    else if (v.toLowerCase() === 'cursor') value = 'Cursor';
+    else if (v.toLowerCase() === 'bolt') value = 'Bolt.new';
+    else if (v.toLowerCase() === 'dify') value = 'Dify';
+    else if (v === '豆包') value = '豆包 MarsCode';
+  }
+  var oldVal = profile[key];
+  profile[key] = value;
+  if (value && value !== '' && value !== null) {
+    var step = KEY_TO_STEP[key] || '?';
+    var label = KEY_LABEL[key] || key;
+    // 历史记录:如果是从旧值改过来的,记"原值 → 新值"轨迹,保留所有改主意的痕迹
+    var newDisplay = (typeof value === 'string' && value.length > 30) ? value.slice(0, 30) + '…' : value;
+    if (oldVal && oldVal !== '' && oldVal !== value) {
+      var oldDisplay = (typeof oldVal === 'string' && oldVal.length > 30) ? oldVal.slice(0, 30) + '…' : oldVal;
+      addHistory(step, key, '🔄 ' + label + ': ' + oldDisplay + ' → ' + newDisplay);
+    } else {
+      addHistory(step, key, '✅ ' + label + ' = ' + newDisplay);
+    }
+  }
+  refreshMemory();
+}
+
+// ==================== Coach 的 system prompt（真实模式）====================
+var COACH_PROMPT = `你是「振振」——一个 Vibe Coding（氛围编程）私人教练。目标用户是编程小白。语气像坐在用户旁边的"技术合伙人"——亲切、鼓励、有幽默感，严禁冷冰冰的客服套话。
+
+## 🔴 全局 RAG 知识库：工具推荐必须从这里选
+你手中有一份 36 个 AI 编程工具的知识库 (TOOL_RAG)，以下是分类总览（详情按需查 TOOL_RAG）：
+- **零代码/低代码 Agent 平台**（8个）：扣子 (Coze)、腾讯元器、百度文心智能体平台、阿里百炼、BetterYeah AI、蚂蚁数科 Agentar、微软 Power Platform、秒哒
+- **工作流编排型 Agent 平台**（9个）：Dify、Flowise、n8n、Make、LangChain、LlamaIndex、AutoGen、CrewAI、ChatDev
+- **AI 编程 IDE/编辑器**（16个）：minimax code（全能 Agent 担当）、Cursor、Trae、豆包 MarsCode、通义灵码、腾讯云 CodeBuddy、文心快码 Comate、CodeGeeX、GitHub Copilot、Windsurf、Tabnine、Amazon Q Developer、JetBrains AI Assistant、Sourcegraph Cody、Fitten Code、OpenCode
+- **命令行/终端 AI 助手**（4个）：Claude Code、Plandex、Warp Code、iFlow CLI
+
+**重要:以下场景必须基于 TOOL_RAG 里的真实描述(含擅长、门槛、网络、部署、费用)回答,严禁凭印象或编造:**
+- **工具推荐**:用户问"推荐个工具/哪些好/哪个适合我"
+- **工具选择**:用户问"选哪个/怎么选/选 A 还是 B"
+- **工具筛选**:用户问"列出所有 XX 类型/有哪些 XX 工具/筛选 XX"
+- **工具对比**:用户问"A 和 B 哪个好/A vs B/A 和 B 区别/对比一下"
+- **具体工具咨询**:用户提到任何具体工具名(如"Cursor 怎么样"),必须用 RAG 里该工具的字段回答
+
+**辅助规则:**
+- 用户问到具体工具:严格按 RAG 5 字段描述(擅长/门槛/网络/部署/费用)
+- 用户问对比:并列展示各工具的 RAG 字段,不要只说"差不多"
+- 用户问推荐:结合用户画像(purpose/network/budget)给 1-3 个,引用 RAG 优势描述
+- 不涉及工具的对话(问候、聊背景、聊痛点)不需要查 RAG
+
+## 🔴 核心交互协议（最高优先级）
+
+你每次回复必须且只能输出一个合法的 JSON 对象（可包在 ~~~json ~~~ fence 里）。结构：
+
+{
+  "text": "给用户看的引导语或回答，Markdown 格式，2-6 行",
+  "options": ["选项A", "选项B", "选项C"],
+  "current_step": "Step 1：破冰与用户画像",
+  "profile_update": {"background": "纯小白", "purpose": "解决个人痛点"}
+}
+
+新增字段 profile_update（可选）：当用户的信息发生改变时，**必须**用这个字段告诉前端。键名固定为以下 8 个，值是字符串：
+- background（编程基础）：值必须是"纯小白" / "有基础" / "专业人士" / "AI 极客" 之一
+- purpose（核心目的）：值必须是"兴趣与探索" / "求职与作品集" / "解决个人痛点" / "商业/业务落地" 之一
+- pain（痛点）：自由文本
+- form（产品形态）：值必须是"Skill" / "Agent" / "融合体" 之一
+- network（网络环境）：值必须是"可科学上网" / "国内直连" 之一
+- budget（预算）：值必须是"0-50" / "50-150" / "150+" 之一
+- pickedTool（最终工具）：自由文本
+- pickedPlan（选定方案）：值必须是"A" / "B" 之一
+
+**重要：你每次回复都要扫一遍用户最新的发言，判断他是否在选/改/补某个字段，一旦出现就要填到 profile_update。**举例：
+- 用户说"我不是纯小白，是有基础" → profile_update: {"background": "有基础"}
+- 用户说"我选错了" → 根据上下文填对应的字段
+- 用户说"其实是 Cursor" → profile_update: {"pickedTool": "Cursor"}
+- 用户补了一句"我用 coze" → profile_update: {"pickedTool": "扣子 (Coze)"}
+- 用户同意你之前的推荐 → 把那个推荐填到 profile_update
+
+严格约束：
+- text：面向用户的中文 Markdown。2-6 行。不含 HTML 标签源码。
+- options：字符串数组，**必须 2-4 个选项**。
+  - 仅当 text 明确写"请直接打字告诉我你的想法"时才能返回 []。
+  - 凡是到了"请你做决策"的点，就必须有 2-4 个 options 让用户点。
+  - 严禁把标题、步骤说明、状态提示、markdown 头放进 options。
+  - options 不能是"继续"/"好的"/"知道了"这种无语义词。必须是具体的下一步动作或选择。
+- current_step：当前所处阶段名，每轮都要更新。
+- profile_update：可选；任何字段没有变化就不填。
+- 唯一合法输出：上面这个 JSON 对象。不要在 JSON 外面堆额外解释。
+
+## 🔴 零硬性约束
+
+### 约束 1：零样本迁移（最高优先级）
+- 提示词中所有案例（旅游攻略、小红书脱水机等）**仅是语法示范，不是业务模板**
+- 你必须把自己当成**从未见过这些案例的工程师**，完全根据用户当下的真实描述，从零构建方案
+- 严禁套用任何示例的具体名词、场景、动作
+
+### 约束 2：动态变量注入（最高优先级）
+- 每次回复前，必须先回顾本对话中用户**实际说过的所有内容**
+- 必须在回复中**强制调用这些真实变量**（领域、人名、痛点、工具、预算）
+- 如果用户没说"旅游"，你嘴里就不能出现"景点"二字
+
+### 约束 3：HTML / Markdown 源码禁出
+- 绝对禁止在回复中包含任何 HTML 标签源码（<b>、<span>、style=、<div class=...>）
+- 你的 Markdown 标记会被前端自动转成富文本样式，你只管写 Markdown
+
+### 约束 4：联网搜索强制触发（[SEARCH: ...] 标记）
+- 触发条件：推荐具体工具/产品/平台/API、评估某项功能能否实现、用户问"现在什么最火"/"最新工具"/"有没有别的选择"、涉及价格/订阅费/免费额度
+- 触发方式：在回复**最开头**插入一行：[SEARCH: 你的具体搜索查询，3-5 个关键词]
+- 严禁凭空捏造工具名称、URL、价格、API 接口
+- 前端会自动识别这个标记并执行真实联网搜索
+
+### 约束 5：动态记忆压缩
+- 对话不设上限。**只要用户不主动说"结束"或"再见"，就必须一直陪跑下去。**
+- 不存在"达到多少条就结束"的内部阈值
+- 当上下文变长时，在内部做一次**记忆压缩**（不展示给用户）：丢弃寒暄和已解决的子问题，保留：用户画像（背景/目的/痛点/形态/网络/预算）、已选工具、核心需求、未决问题
+- 永远不要主动结束对话、不要说"我们到这吧"、不要提"我们已经聊了多少轮"
+
+## 全局：动态路由与流程接管机制
+
+### 1. 流程是脚手架，不是枷锁
+预设的 Step 1-8 + 中期是为了帮助小白用户，不是用来限制他们的。
+
+### 2. 随时响应"流程跳跃"
+如果用户在任意阶段主动表示"我已经决定了"、"我知道我想用什么"、"我的痛点是XXX"，你必须立即停止当前预设的提问。**绝对禁止无视用户的发言，继续抛出下一个预设问题！**
+
+**"跳跃"不等于"跳过"**：用户首次提明确方向时，**先反问一次**：
+> "我注意到你提到了 [XX]，你想直接跳到 [该环节] 吗？还是先走完当前的 [当前步骤]？"
+
+### 3. 处理"用户自带方案"的标准 SOP（4 步）
+当用户提出自己的工具或想法时（如"我用 Cursor 行不行"），严格按照以下 4 步回复：
+1. **共情与肯定**：先肯定用户想法
+2. **客观分析**：结合用户之前的画像，客观分析优缺点（不预设对错）
+3. **给出建议**：明确"这个工具适不适合你"。不适合则推荐更适合的；适合则表示支持
+4. **顺滑拉回主线**：回复最后，自然引导至下一个环节
+
+### 4. 绝对尊重用户选择
+用户坚持自己的选择时，无条件尊重并支持，立即顺着用户的决定走。
+
+### 5. 防固化警告
+本提示词中包含的所有具体工具名称（Cursor、扣子 Coze、百炼等），**仅是回复逻辑的演示举例**。严禁将任何特定工具作为默认推荐。在实际对话中，必须依赖 [SEARCH: ...] 触发真实联网搜索，结合用户真实画像动态推荐。
+
+## 步骤闭环规则
+
+在结束当前步骤的对话之前，**必须**先完成以下三件事中的任意一件，然后明确询问用户是否同意进入下一步，得到肯定答复后才能跳转。
+
+三个闭环条件（任一满足即可）：
+1. 总结当前步骤的结论——明确说出"关于 [步骤名称]，我们定了 [结论]"
+2. 确认用户对当前步骤没有疑问——明确问"关于这一步，你还有疑问吗？"
+3. 记录一个"已完成"的状态标记
+
+三件事后必须加【跳转询问】：
+> 当前关于 [步骤名称] 的讨论已经差不多了。我已经帮你梳理了 [核心结论]。我们可以进入下一步，聊聊 [下一步名称] 了吗？
+
+要求：
+- 三个变量 [步骤名称] [核心结论] [下一步名称] **必须填**实际内容
+- 必须以问句结束（"了吗？"），给用户【是/否】的机会
+- 不能在没走完闭环条件前直接跳下一步
+
+## 联网结果使用规则
+
+当联网搜索工具返回结果后，本次回复必须**严格基于联网结果**。训练数据仅作为"背景知识参考"，**不得**覆盖、补充、修改联网结果。
+
+1. 联网返回后，回复必须严格基于联网结果
+2. 联网结果与训练知识冲突时，以联网结果为准
+3. 联网结果里没提到的内容，明确说"联网结果中未找到"
+4. 引用具体内容时必须带出处（URL / 文档标题 / 版本号 / 发布时间）
+5. 每次调用联网后的回复，话术开篇必须说："我刚刚在网上为你深度搜索了..." 或 "⚠️ 联网结果中未找到 X，以下按训练数据谨慎回答"
+6. 严禁脱网后凭印象推荐。工具推荐、定价、API 能力这类需要准实时信息的问题，**未联网不推荐**。
+
+## 主动记忆与回顾规则
+
+真正的 Agent 会在关键节点主动调取之前的信息（预算、痛点、网络、形态等），并在回复中明确提及。
+
+触发场景：
+- 工具推荐（Step 7）
+- 方案设计（痛点拆解 / 方案生成）
+- 生成 Markdown 执行清单
+- 用户表示"用这个工具吧 / 就它了"
+- 讨论"怎么做 / 多少钱 / 免费吗"等具体决策
+
+调取要求：
+- **必须**在回复中明确提及至少 1 条用户之前提供的信息
+- 可以用"你刚才说"、"记得你提到"、"按你之前说的"等明示话术
+- 示例（假设用户在 Step 6 说"预算 50 以内"）：
+  > "**还记得你之前说预算 50 元以内吗？** 我推荐的这个工具 **Coze（扣子）** 完全免费，你零成本就能用上。"
+
+## 核心行为准则
+
+### A. 永远提供"保姆级"选项
+每次回复结尾，必须附带 2-4 个可点击的选项按钮（options 数组）。文案简短、动作明确、带 Emoji 引导。严禁空回复。
+
+### B. 强制"多想三步"原则
+每个方案选项都要预想好接下来的 3 个具体步骤：
+[ 🚀 **方案A：XXX** | 1.做XX -> 2.做XX -> 3.做XX ]
+
+### C. 动态追问（剥洋葱法）
+用户说"没思路"或"脑子乱"时，每次只问一个最核心的细节。
+
+### D. 随时接管与兜底
+用户在自由输入时卡壳，主动提供"帮我写"、"换个思路"的选项。
+
+## 完整 8 步引导流程 SOP
+
+### 核心原则（贯穿 8 步）
+- 你是教练，不是流水线机器
+- 随时响应"流程跳跃"
+- 绝对尊重用户选择
+- 用户提出工具/想法时，4 步 SOP（肯定 → 分析 → 建议 → 拉回）
+
+### Step 1：破冰与用户画像
+- text：欢迎来到 Vibe Coding！先了解你的背景。
+- options：🌱 纯小白 / 🌿 有基础 / 🌳 专业人士 / 🤖 AI 极客
+- current_step: "Step 1：破冰与用户画像"
+
+### Step 2：明确核心目的
+- text：太棒了！那这次你最想实现什么目标？
+- options：✨ 兴趣与探索 / 💼 求职与作品集 / 🛠 解决个人痛点 / 🚀 商业/业务落地
+- current_step: "Step 2：明确核心目的"
+
+### Step 3：挖掘具体痛点（核心步骤）
+- text：咱们不急着定义它是啥工具，先说说你的痛点。哪怕只是模糊的念头也行。
+- options：🤯 脑子有点乱 / 💡 我有个大概想法 / 👀 看看别人都解决了什么痛点
+- current_step: "Step 3：挖掘具体痛点"
+- 选"看别人案例"时：必须调用联网搜索 2024/2025最新 AI 自动化工具案例，总结 3 个最适合当前用户画像的案例，以"多想三步"格式提供。
+
+### Step 4：确定产品形态
+- text：要给这个想法定个"形态"。Skill / Agent / 融合体。
+- options：🔧 Skill / 🤖 Agent / 🔀 融合体 / 🤔 没概念给例子
+- current_step: "Step 4：确定产品形态"
+- 选"没概念给例子"时：动态联网搜索"2024/2025最新 AI 自动化工具爆款案例"或"Cursor/Lovable 热门应用"，提炼 3 个最典型案例（Skill/Agent/融合体各一），选项按钮只保留极简文案。
+
+### Step 5：网络环境确认
+- text：因为最好用的 AI 编程工具分布在全球各地，我得先确认你的网络环境。
+- options：🌍 能 / 🇨🇳 不能
+- current_step: "Step 5：网络环境确认"
+
+### Step 6：预算评估
+- text：最后一个关键问题：你每个月大概打算投入多少预算？
+- options：💰 0-50 / 💵 50-150 / 💎 150+
+- current_step: "Step 6：预算评估"
+
+### Step 7：工具精准推荐引擎（最高优先级）
+- 强制记忆与条件汇总：Step 1-6 所有信息作为唯一约束
+- 强制联网搜索（禁止凭空捏造）：调用联网搜索，关键词必须包含用户具体约束条件
+- 动态匹配与排序：筛选出最符合的 1-3 款工具，按推荐度从高到低排序
+- 话术规范：开场明确"🏆 教练首推：[工具名称]"，用大白话解释为什么在这场景下最合适
+- options：🏆 教练首推 / 🥈 备选 A / 🥉 备选 B / 🔄 我有别的想法
+- current_step: "Step 7：工具精准推荐引擎"
+
+### Step 8：获取工具与"避坑"指南
+- text：工具敲定啦！教练避坑提醒：[根据用户画像和所选工具动态生成]
+- options：📥 获取官方链接 / 🆓 想知道白嫖方法 / 🆘 注册卡住了 / ✅ 我已经搞定了
+- current_step: "Step 8：获取工具与避坑"
+- 后台：选"我已经搞定了" → 回复仪式感过渡话术，然后进入中期（Vibe Coding 实战阶段）
+- 动态适配：如果工具完全免费，隐藏 [🆓 想知道白嫖方法] 选项
+
+## 痛点拆解与方案生成引擎
+
+### 严禁"示例过拟合"与"路径依赖"
+提示词中所有案例**仅是语法示范**。严格遵守：
+- 例子仅是语法示范：禁止将案例中的具体名词套用到其他用户
+- 强制提取抽象逻辑：数据源 + 处理逻辑 + 交付形式
+- 动态变量注入（最高优先级）
+- 跨界联想测试：面对农业监控、法律合同审查、医疗问诊、教育陪练等场景，展现跨领域知识储备
+
+### 处理"完全没想法"的三步引导
+
+当用户表示"我完全没想法"时，**绝对不能退缩**，立刻接管主导权：
+
+**第一步：情绪共鸣 + 兜底承诺**
+> "太正常了！面对 AI 觉得无从下手，是因为咱们还没摸清它的底细。你放心，AI 的边界由我来帮你摸！你只管大胆地说出你的烦恼..."
+
+**第二步：拆解痛点**
+不问"你想怎么解决"，而是问"这个麻烦里，你最烦的环节是什么？"
+
+**第三步：AI 能力匹配**
+当用户选了具体环节后，立刻给出 2 个实现途径。
+
+### 核心任务：把"模糊烦恼"翻译成"可落地的工程方案"
+
+1. **动态调用上下文**：必须回顾用户在 Step 3 中明确提到的"真实痛点"，并在话术中准确复述
+2. **尊重用户的历史选择**：必须严格结合 Step 4 确定的产品形态（Skill / Agent / 融合体）
+3. **处理"用户自由输入"的双向判断**：
+   - 情况 A（纯吐槽）：给 2 个具体工程方案
+   - 情况 B（衍生小方案）：评估"当前 Vibe Coding 能否实现"→ 能实现：细化；不能实现：降级但可行的替代方案
+4. **方案的"工程级"颗粒度**：
+   - 数据源：具体到平台和入口
+   - 技术链路：是否需要调用大模型？是否需要联网搜索？
+   - 落地条件：是否需要科学上网？是否有替代的国内方案？是否涉及额外花费？
+   - 工作流雏形：第一步、第二步、第三步
+5. **触发"深度调研"**：选"这两个都不行"时，强制联网搜索"市面上解决 [用户痛点] 的 AI 产品/工作流"，重新生成方案 A 和 B
+
+## Markdown 转化与落地交付引擎
+
+### 顺滑引导生成 Markdown
+话术："方案已经非常清晰了！接下来，我帮你把这套工作流直接生成一份专属的 Markdown 执行清单..."
+
+严格使用【万能 Markdown 模板引擎】生成代码块，绝不要提及生成 PRD/PPT。
+
+话术补充（推荐包含科普）：
+> "Coach 小贴士：什么是 Markdown？它就像是一份"AI 专属说明书"，排版极其清晰。用它来跟 AI 工具沟通，能大幅节省 Token..."
+
+### 落地路径的预期管理（交付三连问）
+
+**选项 A：纯自用（本地永久化）**
+- 痛点：AI 生成的临时网页链接可能会失效
+- 解法：本地文件 / GitHub Pages / Vercel
+
+**选项 B：作品展示（获取社交反馈）**
+- 痛点：做好了想发朋友圈炫耀
+- 解法：录 demo 视频 + Netlify 短链接 + 标题模板
+
+**选项 C：商业落地（变现与部署）**
+- 痛点：想卖给别人 / 给公司用
+- 解法：服务器部署 + 域名 + 用户系统 + 隐私协议
+
+## 中期实战陪伴阶段
+
+用户走完 8 步后进入中期（Vibe Coding 实战）。这一阶段没有预设步骤，但必须遵守：
+1. 主动记忆调用：每一轮主动调取 Step 1-8 的关键变量
+2. 不设步骤上限：用户可以连续问 100 轮。你不主动结束
+3. 始终带【记忆标识】："按你之前说..."、"你选了 X 工具"
+4. 随时返回补充：用户表示"我重看了一下方案"，立即接纳并重调上下文
+5. 生成 Markdown 时强制调用上下文：不能生成"万能模板"
+
+## 总结
+
+你就是用户的技术合伙人。引导流程是脚手架，不是围墙。用户随时可以打断、跳转、改方向。只要用户不主动说"结束"或"再见"，就必须一直陪跑。不要在任何回复中提示"我们已经聊了 X 轮"。
+`;
+
+// ==================== 状态 ====================
+var state = {
+  history: [],
+  isRealMode: false,
+  wantingChange: false  // 用户点“想换”后临时打开，重新进入 step 后重置
+};
+
+var els = {};
+
+// ==================== 初始化 ====================
+function init() {
+  els.msgs = document.getElementById('msgs');
+  els.prev = document.getElementById('prev');
+  els.ti = document.getElementById('ti');
+  els.sb = document.getElementById('sb');
+  els.rb = document.getElementById('rb');
+  els.settingsBtn = document.getElementById('settingsBtn');
+  els.modal = document.getElementById('settingsModal');
+  els.provider = document.getElementById('provider');
+  els.baseUrl = document.getElementById('baseUrl');
+  els.baseUrlHint = document.getElementById('baseUrlHint');
+  els.model = document.getElementById('model');
+  els.apiKey = document.getElementById('apiKey');
+  els.saveConfig = document.getElementById('saveConfig');
+  els.skipConfig = document.getElementById('skipConfig');
+
+  els.sb.addEventListener('click', sendMsg);
+  els.ti.addEventListener('keypress', function(e){ if(e.key==='Enter') sendMsg(); });
+  els.rb.addEventListener('click', reset);
+  els.settingsBtn.addEventListener('click', openSettings);
+  // 预置角标点击 = 打开设置
+  var badge = document.getElementById('builtInBadge');
+  if (badge) badge.addEventListener('click', openSettings);
+  els.provider.addEventListener('change', updateProviderDefaults);
+  els.saveConfig.addEventListener('click', saveConfig);
+  // 重置为预置 key
+  var resetBtn = document.getElementById('resetBuiltIn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', function(){
+      try {
+        localStorage.setItem('vcc_llm_config', JSON.stringify(BUILT_IN_CONFIG));
+        // 回填 UI
+        els.provider.value = BUILT_IN_CONFIG.provider;
+        els.baseUrl.value = BUILT_IN_CONFIG.baseUrl;
+        els.apiKey.value = BUILT_IN_CONFIG.apiKey;
+        updateProviderDefaults();
+        els.model.value = BUILT_IN_CONFIG.model;
+        alert('✅ 已重置为预置配置(DeepSeek LLM + 博查联网)\n\n点"保存并启用"生效,或直接关掉弹窗使用。');
+      } catch(e) { alert('重置失败:' + e.message); }
+    });
+  }
+  els.skipConfig.addEventListener('click', function(){ closeSettings(); });
+
+  var saved = localStorage.getItem('vcc_llm_config');
+  if (saved) {
+    try { state.isRealMode = true; } catch(e) {}
+  } else {
+    // 没保存的配置 -> 自动用预置的,打开就能用(面试场景)
+    try {
+      localStorage.setItem('vcc_llm_config', JSON.stringify(BUILT_IN_CONFIG));
+      state.isRealMode = true;
+    } catch(e) {}
+  }
+  // 双保险:联网 key 没存就写入预置(避免老用户 localStorage 残留导致联网失效)
+  try {
+    if (!localStorage.getItem('vcc_tavily_key')) {
+      localStorage.setItem('vcc_tavily_key', BUILT_IN_BOCHA_KEY);
+    }
+  } catch(e) {}
+  // 不再自动弹设置窗(已预置 key)
+
+  updateProviderDefaults();
+  showNode('s1');
+}
+
+// ==================== 预置 LLM 配置(面试场景:打开就能用)====================
+// 面试官打开链接直接对话,无需配 key。如需换 key,点右上角 ⚙️
+// 公开版：key 已脱敏。面试官 clone 后想跑通，请到右上角 ⚙️ 配置自己的 key。
+// ⚠️ 千万不要把真实 key 提交到 GitHub！否则会被刷 token。
+var BUILT_IN_CONFIG = {
+  provider: 'deepseek',
+  baseUrl: 'https://api.deepseek.com/v1',
+  model: 'deepseek-chat',
+  apiKey: 'YOUR_DEEPSEEK_API_KEY',
+  bochaKey: 'YOUR_BOCHA_API_KEY'
+};
+var BUILT_IN_BOCHA_KEY = 'YOUR_BOCHA_API_KEY';
+function getBuiltInConfig() { return JSON.parse(JSON.stringify(BUILT_IN_CONFIG)); }
+
+var PROVIDERS = {
+  deepseek:{name:'DeepSeek',baseUrl:'https://api.deepseek.com/v1',models:[
+    {v:'deepseek-chat',h:'⚡ V3 速度快，推荐默认'},
+    {v:'deepseek-reasoner',h:'🧠 R1 思考模式（慢但准）'}
+  ]},
+  openai:{name:'OpenAI',baseUrl:'https://api.openai.com/v1',models:[
+    {v:'gpt-4o',h:'旗舰版'},{v:'gpt-4o-mini',h:'轻量版'},{v:'o1-preview',h:'推理增强'}
+  ]},
+  moonshot:{name:'Moonshot',baseUrl:'https://api.moonshot.cn/v1',models:[
+    {v:'moonshot-v1-128k',h:'128K 长上下文'},{v:'moonshot-v1-32k',h:'32K'},{v:'moonshot-v1-8k',h:'8K'}
+  ]},
+  qwen:{name:'通义千问',baseUrl:'https://dashscope.aliyuncs.com/compatible-mode/v1',models:[
+    {v:'qwen3-max',h:'🔥 最新旗舰，最强（推荐）'},
+    {v:'qwen-max',h:'上代旗舰'},
+    {v:'qwen-plus',h:'中等'},
+    {v:'qwen-turbo',h:'轻量快速'},
+    {v:'qwen-long',h:'长文档'}
+  ]},
+  custom:{name:'自定义',baseUrl:'',models:[]}
+};
+
+function updateProviderDefaults() {
+  var p = PROVIDERS[els.provider.value];
+  if (!p) return;
+  if (p.baseUrl) els.baseUrl.value = p.baseUrl;
+  els.baseUrlHint.textContent = p.name + ' 默认地址';
+  els.model.innerHTML = '';
+  p.models.forEach(function(m){
+    var opt = document.createElement('option');
+    opt.value = m.v; opt.textContent = m.v + ' — ' + m.h;
+    els.model.appendChild(opt);
+  });
+  if (p.models.length === 0) {
+    var opt = document.createElement('option');
+    opt.value = ''; opt.textContent = '（自定义：在 baseUrl 填你的服务地址）';
+    els.model.appendChild(opt);
+  }
+}
+
+function openSettings() {
+  var saved = localStorage.getItem('vcc_llm_config');
+  if (saved) {
+    try {
+      var config = JSON.parse(saved);
+      els.provider.value = config.provider || 'deepseek';
+      els.baseUrl.value = config.baseUrl || '';
+      els.apiKey.value = config.apiKey || '';
+    } catch(e) {}
+  }
+  document.getElementById('tavilyKey').value = getTavilyKey() || '';
+  updateProviderDefaults();
+  if (saved) {
+    try {
+      var config = JSON.parse(saved);
+      if (config.model) els.model.value = config.model;
+    } catch(e) {}
+  }
+  els.modal.classList.remove('hidden');
+}
+
+function closeSettings() { els.modal.classList.add('hidden'); }
+
+function saveConfig() {
+  var config = {
+    provider: els.provider.value,
+    baseUrl: els.baseUrl.value.trim(),
+    model: els.model.value,
+    apiKey: els.apiKey.value.trim()
+  };
+  if (!config.baseUrl) { alert('请填 Base URL'); return; }
+  if (!config.apiKey) { alert('请填 API Key'); return; }
+  if (!config.model) { alert('请选模型'); return; }
+
+  config.apiKey = config.apiKey.replace(/[\s\u200B-\u200D\uFEFF]/g, '');
+  config.baseUrl = config.baseUrl.replace(/[\u200B-\u200D\uFEFF]/g, '');
+
+  var asciiOnly = /^[\x00-\x7F]*$/;
+  if (!asciiOnly.test(config.apiKey)) {
+    alert('❌ API Key 包含非 ASCII 字符\n\n可能原因：\n• 复制时带上了零宽字符或全角空格\n• Key 前后有多余的换行/空格\n\n请到 DeepSeek 平台重新复制一次，只取 "sk-..." 部分');
+    return;
+  }
+  if (!asciiOnly.test(config.baseUrl)) {
+    alert('❌ Base URL 包含非 ASCII 字符\n\n示例：https://api.deepseek.com/v1');
+    return;
+  }
+  if (!config.baseUrl.startsWith('http://') && !config.baseUrl.startsWith('https://')) {
+    alert('❌ Base URL 必须以 http:// 或 https:// 开头');
+    return;
+  }
+
+  var tavilyKey = document.getElementById('tavilyKey').value.trim();
+  tavilyKey = tavilyKey.replace(/[\s\u200B-\u200D\uFEFF]/g, '');
+  if (tavilyKey && !asciiOnly.test(tavilyKey)) {
+    alert('❌ 联网搜索 Key 包含非 ASCII 字符');
+    return;
+  }
+  if (tavilyKey) setTavilyKey(tavilyKey);
+
+  localStorage.setItem('vcc_llm_config', JSON.stringify(config));
+  state.isRealMode = true;
+  closeSettings();
+  var msg = '✅ <b>已启用真实模式！</b> 现在你可以直接打字跟 Coach 自由对话了。';
+  if (tavilyKey) msg += '<br>🔍 联网搜索已启用(博查),Step 7 工具推荐会查最新工具。';
+  addMessage('ai', msg, [], '⚙️ 配置完成');
+}
+
+// ==================== 消息 + chip 渲染 ====================
+function addMessage(role, text, chips, stepTitle, stepGroup) {
+  state.history.push({role: role==='u'?'u':'ai', text: text, chips: chips || [], stepTitle: stepTitle || '', stepGroup: stepGroup || ''});
+  render();
+}
+
+function render() {
+  if (state.history.length === 0) {
+    els.msgs.innerHTML = '<div class="empty"><h2>👋 欢迎</h2><p>点击下方选项开始 8 步引导</p><p>或直接在输入框打字跟 Coach 说话</p></div>';
+  } else {
+    var html = '';
+    for (var i = 0; i < state.history.length; i++) {
+      var m = state.history[i];
+      html += '<div class="msg ' + (m.role==='u'?'u':'') + '">';
+      html += '<div class="av">' + (m.role==='u'?'我':'⚡') + '</div>';
+      html += '<div class="msg-body">';
+      if (m.stepTitle) {
+        html += '<div class="step-indicator">📍 ' + escapeAttr(m.stepTitle) + '</div>';
+      }
+      html += '<div class="bub">' + smartFormat(m.text) + '</div>';
+      if (m.role === 'ai' && m.chips && m.chips.length > 0) {
+        html += '<div class="msg-options">';
+        m.chips.forEach(function(c, idx){
+          var clicked = m.clickedOptions && m.clickedOptions[idx] ? ' disabled' : '';
+          html += '<button class="option-btn' + clicked + '" data-idx="' + idx + '" data-label="' + escapeAttr(c.l) + '" data-next="' + escapeAttr(c.n || '') + '">' + c.l + '</button>';
+        });
+        html += '</div>';
+      }
+      html += '</div>';
+      html += '</div>';
+    }
+    els.msgs.innerHTML = html;
+    els.msgs.querySelectorAll('.option-btn:not(:disabled)').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        clickOption(btn);
+      });
+    });
+    els.msgs.scrollTop = els.msgs.scrollHeight;
+  }
+}
+
+function escapeAttr(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function showNode(nodeId, opts) {
+  var node = NODES[nodeId];
+  if (!node) return;
+  opts = opts || {};
+
+  // 防止回头问已确认的 step
+  // s3_input / s3_idea / s3_confused / s3_examples 是同一步的子状态，算同一个 stepGroup
+  // s8_get / s8_free / s8_help 是 Step 8 的子页面，不锁定
+  var lockableGroups = ['s1', 's2', 's3', 's4', 's5', 's6', 's7'];
+  var stepGroup = nodeId;
+  if (nodeId.indexOf('_') > 0) stepGroup = nodeId.split('_')[0]; // s3_input → s3
+
+  // 是否是“锁定步”（不同子状态同 step group）
+  var isLockable = lockableGroups.indexOf(stepGroup) >= 0;
+
+  // 哪些 step 在已选后才算锁定
+  var groupToProfileKey = {
+    s1: 'background', s2: 'purpose', s3: 'pain',
+    s4: 'form', s5: 'network', s6: 'budget', s7: 'pickedTool'
+  };
+  var profileKey = groupToProfileKey[stepGroup];
+  var hasProfileValue = profileKey && profile[profileKey];
+
+  // 是否是“正向导航”（从点击 chip 过来的、不是回头）
+  // 判断：上一条 ai 消息是当前 step 的兄弟状态（同一 step group）
+  // 补充：调用方传 isForward=true 强制走正常路径
+  var isForward = !!opts.isForward;
+  if (!isForward) {
+    var lastAiGroup = null;
+    for (var i = state.history.length - 1; i >= 0; i--) {
+      if (state.history[i].role === 'ai' && state.history[i].stepGroup) {
+        lastAiGroup = state.history[i].stepGroup;
+        break;
+      }
+    }
+    // 上一条是同 step group 的兄弟状态（如 s3_input → s3_plans），认为是正向导航
+    isForward = lastAiGroup && lastAiGroup === stepGroup;
+  }
+
+  // 满足以下全部才显示摘要：
+  // 1. 是锁定步
+  // 2. 这个 step 已被确认（用户之前点过选项）
+  // 3. profile 有值
+  // 4. 不是“临时想换”
+  // 5. 不是正向导航（从同一 step group 的兄弟状态过来 或 显式传 isForward）
+  if (isLockable && profile.confirmed[stepGroup] && hasProfileValue && !state.wantingChange && !isForward) {
+    showConfirmedSummary(stepGroup, nodeId, node);
+    return;
+  }
+
+  var text = '';
+  if (typeof node.agent === 'function') {
+    text = node.agent(profile);
+  } else if (node.agent) {
+    text = node.agent;
+  }
+  if (node.question) text += '\n\n**' + node.question + '**';
+
+  var chips = typeof node.chips === 'function' ? node.chips(profile) : node.chips;
+  // 推算 stepGroup
+  var sg = nodeId;
+  if (nodeId.indexOf('_') > 0) sg = nodeId.split('_')[0];
+  addMessage('ai', text, chips, node.step || '', sg);
+
+  if (nodeId === 's3_examples' || nodeId === 's4_examples') {
+    setTimeout(function(){ searchAndShowExamples(nodeId); }, 100);
+  }
+
+  // 不在这里 mark confirmed，只在 clickOption 里用户选完选项后才 mark
+
+  // 更新右侧方案书
+  renderPlan();
+}
+
+// ==================== 已确认 step 的摘要展示 ====================
+// 不要重复问已确认的 step，只给个“摘要 + 我想换一个”
+function showConfirmedSummary(stepGroup, originalNodeId, node) {
+  var summary = {
+    s1: {label: '背景', val: profile.background || '（未填）'},
+    s2: {label: '目的', val: profile.purpose || '（未填）'},
+    s3: {label: '痛点', val: profile.pain ? profile.pain.slice(0, 30) + (profile.pain.length > 30 ? '...' : '') : '（未填）'},
+    s4: {label: '形态', val: profile.form || '（未填）'},
+    s5: {label: '网络', val: profile.network || '（未填）'},
+    s6: {label: '预算', val: (profile.budget || '?') + ' 元/月'},
+    s7: {label: '工具', val: profile.pickedTool || '（未选）'}
+  }[stepGroup];
+
+  var text = '✓ <b>Step ' + stepGroup.replace('s', '') + ' 已确认：</b>' + summary.label + ' = <b>' + summary.val + '</b>\n\n' +
+    '你之前选的这个我不重复问了，除非你说想换。\n\n' +
+    '如果你说 <code>我想换 ' + summary.label + '</code>，我再重新给选项。';
+
+  // 跳转回原节点 + 清除“临时想换”标志：让用户走原节点本身
+  var chips = [
+    {l: '🔄 <b>我想换 ' + summary.label + '</b>', n: originalNodeId, setChange: true},
+    {l: '➡️ <b>继续</b>，下一步', n: getNextStepId(stepGroup)}
+  ];
+
+  addMessage('ai', text, chips, '✓ Step ' + stepGroup.replace('s', '') + ' 已确认（不会重复问）');
+  renderPlan();
+}
+
+// 获取某 step 后的下一步节点 ID
+function getNextStepId(stepGroup) {
+  var flow = {
+    s1: 's2', s2: 's3', s3: 's3_input', s4: 's5', s5: 's6', s6: 's7', s7: 's8'
+  };
+  return flow[stepGroup] || 's1';
+}
+
+// ==================== 联网搜索 + 真实案例库（演示版 fallback）====================
+var REAL_CASES = {
+  s3_examples: [
+    {emoji:'🚀', title:'Trickle — Product Hunt 周榜冠军', desc:'纯对话生成网站 + 一键部署，零基础 20 分钟做出番茄钟白噪音网站、书籍推荐网站，$20/月。来源：Product Hunt 2025年7月第一名。', url:'trickle.so'},
+    {emoji:'💼', title:'商科生一周三成果 — 简历生成器 / 图片滤镜 / 简历筛选器', desc:'零基础大三学生用 AiPy 一周做 3 个能跑的工具，HR 朋友从一下午到 5 分钟搞定简历筛选。来源：SegmentFault、CSDN 实战文章。', url:'segmentfault.com/a/1190000047754478'},
+    {emoji:'🎯', title:'活动报名系统 — 20 分钟搭出全栈应用', desc:'响指 Haisnap 平台，输入自然语言 20 分钟生成完整前后端 + 数据库 + 用户认证，零配置。来源：CSDN 实战案例。', url:'csdn.net'},
+    {emoji:'🐢', title:'程序员养龟 — Claude Code + Home Assistant 24 小时监控', desc:'把 Claude Code 接 Home Assistant，养龟 6 只龟 24 小时温度湿度自动监测 + 异常报警。来源：少数派 sspai 推荐。', url:'sspai.com'},
+    {emoji:'📝', title:'智能待办事项 — InsCode(快马)一键生成', desc:'React + Node.js + MongoDB + AI 任务建议，零配置一键部署，支持移动端响应式。来源：CSDN 实战。', url:'inscode.net'},
+    {emoji:'🎨', title:'富文本渲染引擎 — iOS 一行代码不写，2 天完成', desc:'博主用 Claude + VSCode 插件，2 天做出支持图文混排、子线程布局的富文本引擎，只花 50 美元 token。来源：博客园。', url:'cnblogs.com'}
+  ],
+  s4_examples: [
+    {emoji:'🔧', title:'Skill 案例 — 简历筛选器（关键词提取）', desc:'输入：用户给一个文件夹，输出：符合关键词的简历列表 + 匹配度排序。Skill 形态：固定输入→固定输出。'},
+    {emoji:'🤖', title:'Agent 案例 — Claude Code 养龟系统', desc:'输入：龟缸温度异常。Agent 自主判断：调 API 查历史 → 算异常等级 → 发通知 → 调加热器。形态：自主拆解+调用工具。'},
+    {emoji:'🔀', title:'融合体案例 — 智能待办（Skill + Agent）', desc:'Skill：标签分类 / 截止日期提醒（固定功能）。Agent：分析历史任务推荐相似事项（自主决策）。组合：稳定功能 + 智能增强。'}
+  ]
+};
+
+async function searchAndShowExamples(nodeId) {
+  var cases = REAL_CASES[nodeId] || REAL_CASES.s3_examples;
+  var key = getTavilyKey();
+
+  var liveResults = [];
+  if (key) {
+    showStatus('正在联网检索 ' + nodeId + ' 全网最新案例...');
+    try {
+      var query = nodeId === 's3_examples'
+        ? 'Vibe Coding 小白 零基础 案例 2025 小红书 即刻'
+        : 'Vibe Coding Skill Agent 形态 案例 2025 Product Hunt 少数派';
+      liveResults = await tavilySearch(query);
+    } catch(e) { liveResults = []; }
+    hideStatus();
+  }
+
+  var msg = '⏳ 正在为你检索全网最新的小白友好型方案...（' +
+    (key ? '联网搜索 ✅ 已配博查 key' : '联网搜索 ⚠️ 未配 key，用本地 RAG 库（37 工具,已覆盖主流）') +
+    '）\n\n';
+  msg += '🔍 检索目标：小红书、即刻、Product Hunt、少数派\n\n';
+
+  if (liveResults.length > 0) {
+    msg += '🌐 **联网实时结果**（最近一周）:\n';
+    liveResults.slice(0, 3).forEach(function(r, i){
+      msg += (i+1) + '. [' + (r.title || '无标题').slice(0, 40) + '](' + (r.url || '#') + ')\n';
+    });
+    msg += '\n';
+  }
+
+  msg += '🏆 **教练精选真实案例**（按热度 + 小白友好度排序）:\n\n';
+  cases.forEach(function(c, i){
+    msg += (i+1) + '. ' + c.emoji + ' **' + c.title + '**\n';
+    msg += '   ' + c.desc + '\n';
+    if (c.url) msg += '   🔗 ' + c.url + '\n';
+    msg += '\n';
+  });
+
+  msg += '---\n\n';
+  msg += '💡 **筛选标准**：\n';
+  msg += '  ✓ 最近一周热度最高（点赞/讨论最多）\n';
+  msg += '  ✓ 零基础上手门槛（不要求会代码）\n';
+  msg += '  ✓ 痛点匹配（解决具体小问题）\n';
+
+  var lastAi = document.querySelectorAll('.msg.ai');
+  if (lastAi.length > 0) {
+    var last = lastAi[lastAi.length - 1];
+    var body = last.querySelector('.msg-body') || last;
+    body.innerHTML = smartFormat(msg);
+  }
+}
+
+// ==================== 用户自由输入：演示模式智能路由 ====================
+// 演示模式下，根据当前步骤和用户输入，智能响应"流程跳跃" / "用户自带方案" / "提问"
+function demoModeReply(userText) {
+  // 提取痛点（自由输入时）
+  if (!profile.pain && state.history.length > 0) {
+    var lastStep = state.history[state.history.length - 1].stepTitle || '';
+    if (lastStep.indexOf('Step 3') >= 0 || lastStep.indexOf('痛点') >= 0) {
+      setProfile('pain', userText);
+    }
+  }
+
+  // 检测：用户说"我就要用 XX"
+  var toolMatch = userText.match(/(我[就]?(要|想|打算)用|用|选择)\s*([A-Za-z\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5\s\.\-]{1,30})/);
+  if (toolMatch) {
+    var tool = toolMatch[3].trim();
+    return demoHandleUserTool(tool, userText);
+  }
+
+  // 检测：用户说"我选错了 / 改一下 / 应该是 X" → 演示模式智能修正（必须在 toolMatch 之后，因为更宽松的修正包含工具名）
+  var correctionMatch = userText.match(/(我?选错了|不对|应该是|改成?|我其实是|其实是|改一下|别用|不是|我?改成?)(.{1,30}?)(。|$)/);
+  if (correctionMatch && (profile.background || profile.purpose || profile.pain || profile.form || profile.network || profile.budget || profile.pickedTool)) {
+    var corrText = (correctionMatch[1] + (correctionMatch[2] || '')).trim();
+    // 尝试匹配现有字段值
+    var foundKey = null, foundVal = null;
+    var aliases = {
+      '纯小白': 'background', '有基础': 'background', '专业人士': 'background', 'AI 极客': 'background', 'AI极客': 'background',
+      '兴趣与探索': 'purpose', '求职与作品集': 'purpose', '解决个人痛点': 'purpose', '商业/业务落地': 'purpose',
+      'Skill': 'form', 'Agent': 'form', '融合体': 'form',
+      '可科学上网': 'network', '国内直连': 'network',
+      '0-50': 'budget', '50-150': 'budget', '150+': 'budget'
+    };
+    Object.keys(aliases).forEach(function(k) {
+      if (corrText.indexOf(k) >= 0) {
+        foundKey = aliases[k];
+        foundVal = k;
+      }
+    });
+    // 特殊：用户在 pickTool 后改主意
+    if (!foundKey && (corrText.indexOf('Cursor') >= 0 || corrText.indexOf('Coze') >= 0 || corrText.indexOf('扣子') >= 0 || corrText.indexOf('Dify') >= 0 || corrText.indexOf('Bolt') >= 0)) {
+      foundKey = 'pickedTool';
+      if (corrText.indexOf('Coze') >= 0 || corrText.indexOf('扣子') >= 0) foundVal = '扣子 (Coze)';
+      else if (corrText.indexOf('Cursor') >= 0) foundVal = 'Cursor';
+      else if (corrText.indexOf('Dify') >= 0) foundVal = 'Dify';
+      else if (corrText.indexOf('Bolt') >= 0) foundVal = 'Bolt.new';
+    }
+    if (foundKey && foundVal) {
+      setProfile(foundKey, foundVal);
+      return {
+        text: '✓ <b>已改！</b> 记忆已更新：' + (KEY_LABEL[foundKey] || foundKey) + ' 改为 <b>' + escapeHtml(foundVal) + '</b>。\n\n接下来你想继续往下走，还是改别的？',
+        chips: [
+          {l: '✅ <b>继续往下走</b>，进入下一步', n: 's' + Math.min(7, (KEY_TO_STEP[foundKey] || 's1').replace('s', '').charCodeAt(0) - 96 + 1)},
+          {l: '🔄 <b>我想换别的</b>', n: 's1'}
+        ],
+        stepTitle: '🔄 记忆已更新'
+      };
+    }
+  }
+
+  // 检测：用户说"我想换 X"（背景/目的/痛点/形态/网络/预算/工具）
+  var changeMatch = userText.match(/我想?换[下个]?\s*(背景|目的|痛点|形态|网络|预算|工具|skill|agent)/i);
+  if (changeMatch) {
+    var label = changeMatch[1];
+    var stepMap = { '背景': 's1', '目的': 's2', '痛点': 's3', '形态': 's4', '网络': 's5', '预算': 's6', '工具': 's7' };
+    var targetStep = stepMap[label] || (label.toLowerCase() === 'skill' ? 's4' : (label.toLowerCase() === 'agent' ? 's4' : null));
+    if (targetStep) {
+      state.wantingChange = true;
+      // 清除该 step 的 confirmed 标记（让重新选择的值不被锁）
+      delete profile.confirmed[targetStep];
+      // 延迟重置
+      setTimeout(function(){ state.wantingChange = false; }, 30000);
+      return {text: '好，下面重新给你 <b>' + label + '</b> 的选项，选完我还会记得之前的选择。', chips: [
+        {l: '🚪 <b>进入 ' + label + ' 选项</b>', n: targetStep}
+      ], stepTitle: '🔄 想换一个'};
+    }
+  }
+
+  // 检测：用户说"我知道我想做什么" / "我已经决定了"
+  if (/我已经决定了|我知道|我就要|我偏向|我想做|直接开始/.test(userText)) {
+    return demoHandleJumpIntent(userText);
+  }
+
+  // 通用：动态追问（剥洋葱）
+  return demoHandleClarify(userText);
+}
+
+function demoHandleUserTool(tool, userText) {
+  // 4 步 SOP：肯定 → 分析 → 建议 → 拉回
+  var p = profile;
+  var recs = recommendTools(p);
+  var isInTop3 = recs.slice(0, 3).some(function(r){ return r.name.indexOf(tool) >= 0 || tool.indexOf(r.name.split(/[（(]/)[0]) >= 0; });
+  var analysis = '';
+  var suggestion = '';
+
+  if (isInTop3) {
+    // 在 top3 里也要告诉用户它“哪里好”，而不是只说“它跟你匹配”
+    var rec = recs.find(function(r){ return r.name.indexOf(tool) >= 0 || tool.indexOf(r.name.split(/[（(]/)[0]) >= 0; });
+    var full = rec && rec.full ? rec.full : null;
+    var oneLiner = full ? full.strength : (rec ? rec.why : '它跟你需求是匹配的');
+    var oneLinerShort = oneLiner && oneLiner.length > 100 ? oneLiner.slice(0, 100) + '…' : oneLiner;
+    // 从 RAG 里补充网络 / 费用 / 门槛信息，让用户全面了解
+    var extras = [];
+    if (full && full.network) {
+      var net = full.network.replace(/^❌\s*/, '').replace(/^是\s*/, '').split('。')[0];
+      if (net.indexOf('不需要') >= 0) extras.push('国内直连');
+      else if (net.indexOf('需要') >= 0) extras.push('需科学上网');
+    }
+    if (full && (full.cost || '').indexOf('免费') >= 0) extras.push('免费');
+    if (full && full.difficulty && full.difficulty.indexOf('⭐') === 0) extras.push('门槛低');
+    var extraStr = extras.length ? '（' + extras.join('，') + '）' : '';
+    analysis = '<b>优点：</b>' + escapeHtml(oneLinerShort) + ' ' + extraStr + '。\n<b>跟你的画像：</b>' + (p.background || '?') + ' + 预算' + (p.budget || '?') + ' + ' + (p.network || '?') + '，匹配度不错。';
+    suggestion = '<b>建议：</b>就用它！我帮你直接进 Step 8 拿工具。';
+    setProfile('pickedTool', tool);
+  } else {
+    // 客观分析优缺点（结合画像）
+    var pros = [];
+    var cons = [];
+    if (/Cursor|Claude Code|Bolt|Lovable|Replit|v0/i.test(tool)) {
+      pros.push('生态成熟，社区活跃');
+      pros.push('能力上限高，做复杂项目没问题');
+      // 订阅费警告：即使没填预算也要告知
+      if (/Cursor|Claude Code/i.test(tool)) cons.push('订阅费约 $20/月（¥140），对零预算同学偏高');
+      if (p.network === '国内直连') cons.push('需要科学上网，你网络环境不支持');
+      if (p.budget === '0-50') cons.push('订阅费超你预算');
+    } else if (/Coze|百炼|智谱|元器|文心|通义/i.test(tool)) {
+      pros.push('国内直连，无需科学上网');
+      pros.push('基本免费或低门槛');
+      if (p.purpose === '商业/业务落地') cons.push('企业级 SLA 需付费版');
+    } else {
+      pros.push('我没听过这个工具的详细情况');
+      cons.push('联网搜可能能找到更多信息');
+    }
+    analysis = '<b>优点：</b>' + pros.join('、') + '。\n<b>挑战：</b>' + (cons.length ? cons.join('、') : '暂时没想到明显的') + '。';
+    if (cons.length > 0 && (p.budget === '0-50' || p.network === '国内直连')) {
+      suggestion = '<b>建议：</b>基于你' + (p.network || '?') + ' + 预算' + (p.budget || '?') + '，我推荐改用 ';
+      var topTool = recs[0].name;
+      suggestion += '<b>' + topTool + '</b>（' + recs[0].why.split('，')[0] + '）';
+      setProfile('pickedTool', topTool);
+    } else {
+      suggestion = '<b>建议：</b>你坚持就用 ' + tool + ' 也行，我支持你！';
+      setProfile('pickedTool', tool);
+    }
+  }
+
+  var text = '哈哈，<b>' + tool + '</b> 确实是热门工具之一！你的眼光很毒辣 👍\n\n' +
+    '不过作为你的教练，我得帮你把把关：\n' + analysis + '\n\n' +
+    suggestion + '\n\n' +
+    '那咱们就以 <b>' + (profile.pickedTool || tool) + '</b> 为准推进，下一步聊聊怎么"领"回家+避坑（<b>Step 8</b>）。';
+
+  return {text: text, chips: [
+    {l: '✅ <b>好，就用 ' + (profile.pickedTool || tool) + '</b>，进入 Step 8', n: 's8'},
+    {l: '🔄 <b>等等，我再想想</b>，先看 Step 7 完整推荐', n: 's7'},
+    {l: '✍️ <b>我再补充一句</b>', n: 's7_custom'}
+  ], stepTitle: '🛠 用户自带方案处理（4 步 SOP）'};
+}
+
+function demoHandleJumpIntent(userText) {
+  return {
+    text: '我注意到你提了 <b>"' + userText.slice(0, 30) + (userText.length > 30 ? '...' : '') + '"</b>。\n\n' +
+      '在我帮你直接跳之前，先反问一次（这是好教练的本能 🏀）：\n\n' +
+      '• 你想直接跳到 <b>工具推荐（Step 7）</b> 还是 <b>落地（中期）</b>？\n' +
+      '• 还是想先 <b>走完当前步骤</b> 再做决定？',
+    chips: [
+      {l: '🚀 <b>直接跳到 Step 7</b>（推荐工具）', n: 's7'},
+      {l: '🎯 <b>直接跳到中期</b>（生成方案书）', n: 'final'},
+      {l: '⏪ <b>先走完当前</b>', n: 's1'}
+    ],
+    stepTitle: '🔀 流程跳跃 + 确认错点'
+  };
+}
+
+function demoHandleClarify(userText) {
+  // 检测痛点关键词
+  var painKeywords = ['每次', '总是', '麻烦', '头疼', '繁琐', '重复', '花时间', '费时间', '头大', '浪费时间', '手动'];
+  var isPain = painKeywords.some(function(k){ return userText.indexOf(k) >= 0; });
+
+  if (isPain && !profile.pain) {
+    setProfile('pain', userText);
+    return {
+      text: '<b>听到了！</b>我把你说的记下来作为痛点：\n\n> ' + userText + '\n\n' +
+        '接下来给你 2 个工程方案。',
+      chips: [
+        {l: '🚀 <b>给我 2 个方案</b>', n: 's3_plans'},
+        {l: '✍️ <b>再补充几句</b>', n: 's3_input'}
+      ],
+      stepTitle: '🎯 痛点已记录'
+    };
+  }
+
+  // 兜底
+  return {
+    text: '收到：「' + userText + '」\n\n' +
+      '（演示版不参与自由对话。点 ⚙️ 设置配 DeepSeek 立即能跟 Coach 自由对话、跳出 8 步限制。）',
+    chips: [
+      {l: '⚙️ <b>去配置 LLM</b>', n: '__openSettings'}
+    ],
+    stepTitle: '💡 提示'
+  };
+}
+
+// ==================== 点击处理 ====================
+function clickOption(btn) {
+  var text = btn.innerText.trim();
+  var nextNode = btn.dataset.next || '';
+
+  els.msgs.querySelectorAll('.option-btn').forEach(function(b){
+    b.disabled = true;
+    b.style.pointerEvents = 'none';
+  });
+
+  var msgId = btn.closest('.msg');
+  if (msgId) {
+    var idx = Array.prototype.indexOf.call(els.msgs.querySelectorAll('.msg'), msgId);
+    if (idx >= 0 && state.history[idx] && state.history[idx].chips) {
+      var chipIdx = parseInt(btn.dataset.idx || '0', 10);
+      state.history[idx].clickedOptions = state.history[idx].clickedOptions || {};
+      state.history[idx].clickedOptions[chipIdx] = true;
+
+      // 写入 profile（走统一入口，自动记历史 + 刷新 memory + 方案书）
+      var chip = state.history[idx].chips[chipIdx];
+      if (chip && chip.set) {
+        Object.keys(chip.set).forEach(function(k){
+          setProfile(k, chip.set[k]);
+        });
+      }
+      // 修复：finalizePlan 决定 pickedPlan（中期方案 A/B）
+      if (chip && chip.finalizePlan) {
+        setProfile('pickedPlan', chip.finalizePlan);
+      }
+      // 用户点了"我想换 XXX" → 临时打开进入 step
+      if (chip && chip.setChange) {
+        state.wantingChange = true;
+      }
+      // 用户实际选了 → 标记当前 step 为已确认
+      // 用消息的 stepGroup 字段更可靠
+      var sg = state.history[idx].stepGroup || '';
+      if (sg && (chip.set || chip.finalizePlan || chip.setChange)) {
+        profile.confirmed[sg] = true;
+      }
+      // 特殊：进入痛点收集后填了 pain，也算 s3 走完
+      if (chip && chip.n === 's3_plans' && profile.pain) {
+        profile.confirmed.s3 = true;
+      }
+    }
+  }
+
+  addMessage('u', text);
+
+  // 如果是“想换”路径，走完一步后重置标志
+  if (state.wantingChange && nextNode) {
+    // 走完原节点后重置（让下一次进来又走“已确认”路径）
+    setTimeout(function(){ state.wantingChange = false; }, 800);
+  }
+
+  if (nextNode === '__openSettings') {
+    setTimeout(openSettings, 100);
+    return;
+  }
+
+  if (state.isRealMode) {
+    callLLM(text);
+    return;
+  }
+
+  // 演示模式
+  if (nextNode) {
+    setTimeout(function(){
+      if (nextNode === 'final') {
+        showNode('final');
+      } else {
+        // 从 chip 点击过来的都属于正向导航（即使是同 step group 内的跳转）
+        showNode(nextNode, {isForward: true});
+      }
+    }, 200);
+    return;
+  }
+
+  setTimeout(function(){
+    addMessage('ai', '收到：「' + text + '」\n\n（演示模式不参与智能对话。点右上角「⚙️ 设置」配置 LLM，配置后所有选项都会走 AI 实时响应。）', []);
+  }, 200);
+}
+
+// ==================== 用户主动发消息 ====================
+async function sendMsg() {
+  var text = els.ti.value.trim();
+  if (!text) return;
+
+  addMessage('u', text);
+  els.ti.value = '';
+
+  if (state.isRealMode) {
+    await callLLM(text);
+    return;
+  }
+
+  // 演示模式智能路由
+  setTimeout(function(){
+    var reply = demoModeReply(text);
+    addMessage('ai', reply.text, reply.chips, reply.stepTitle || '', reply.stepGroup || '');
+  }, 200);
+}
+
+// ==================== 联网搜索 ====================
+function getTavilyKey() {
+  return localStorage.getItem('vcc_tavily_key') || BUILT_IN_BOCHA_KEY;
+}
+function setTavilyKey(key) {
+  localStorage.setItem('vcc_tavily_key', key);
+}
+function getBochaKey() { return getTavilyKey(); }
+function setBochaKey(k) { return setTavilyKey(k); }
+
+async function tavilySearch(query) {
+  // 改用博查(国内,可直连)——兼容旧函数名 tavilySearch
+  return await bochaSearch(query);
+}
+async function bochaSearch(query) {
+  var key = getTavilyKey();
+  if (!key) return [];
+  try {
+    var resp = await fetch('https://api.bochaai.com/v1/web-search', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + key,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        query: query,
+        summary: true,
+        count: 5,
+        freshness: 'noLimit'
+      })
+    });
+    if (!resp.ok) return [];
+    var data = await resp.json();
+    var pages = (data && data.data && data.data.webPages && data.data.webPages.value) || [];
+    return pages.map(function(p) {
+      return {
+        title: p.name || '',
+        url: p.url || '',
+        content: p.summary || p.snippet || '',
+        siteName: p.siteName || ''
+      };
+    });
+  } catch (e) {
+    return [];
+  }
+}
+
+// ==================== LLM 调用 ====================
+async function callLLM(userText) {
+  showStatus('Coach 正在思考...');
+  els.sb.disabled = true;
+
+  try {
+    var config = JSON.parse(localStorage.getItem('vcc_llm_config') || 'null') || BUILT_IN_CONFIG;
+
+    var searchResults = [];
+    var recentText = state.history.slice(-6).map(function(m){ return m.text; }).join('\n');
+    var preventiveTriggers = ['Step 6', 'Step 7', '工具推荐', '联网', '推荐工具', '最新工具', '选哪个工具', '价格', '免费', '订阅', 'API', '可行性', '能不能实现', '现在什么最火', '最新动态'];
+    var needsPreventiveSearch = preventiveTriggers.some(function(k){ return recentText.indexOf(k) >= 0; });
+
+    if (needsPreventiveSearch) {
+      showStatus('联网搜索中...');
+      var tavilyKey = getTavilyKey();
+      if (tavilyKey) {
+        searchResults = await tavilySearch('best vibe coding AI tools 2026 Coze Dify Cursor Bolt.new Replit Lovable Bubble');
+      }
+    }
+
+    showStatus('Coach 正在回复...');
+
+    var searchContext = '';
+    if (searchResults.length > 0) {
+      searchContext = '\n\n## 🔍 预防性联网搜索结果（供参考）：\n';
+      searchResults.forEach(function(r, i){
+        searchContext += (i+1) + '. ' + (r.title || '') + '\n   ' + (r.content || '').slice(0, 200) + '\n';
+      });
+    }
+    // 触发按需 RAG 检索:用户消息命中工具/选择/对比/推荐等关键词时,额外注入
+    var onDemandRag = getRelevantRagForQuery(userText);
+    var ragBlock = '## 📚 工具 RAG 知识库（' + TOOL_RAG.length + ' 个工具，工具推荐必查这里）\n' + getRagContext();
+    if (onDemandRag) {
+      ragBlock += '\n' + onDemandRag;
+    }
+    var messages = [{role: 'system', content: COACH_PROMPT + '\n\n## 🧠 实时记忆快照（你必须每轮都看到）\n' + getMemorySnapshot() + '\n\n' + ragBlock + searchContext}];
+
+    var recent = state.history.slice(-12, -1);
+    recent.forEach(function(m){
+      messages.push({role: m.role === 'u' ? 'user' : 'assistant', content: m.text});
+    });
+    messages.push({role: 'user', content: userText});
+
+    var resp = await fetch(config.baseUrl + '/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + config.apiKey
+      },
+      body: JSON.stringify({
+        model: config.model,
+        messages: messages,
+        stream: true,
+        temperature: 0.7
+      })
+    }).catch(function(err){
+      throw new Error('网络请求失败：' + err.message + '\n\n请检查：\n1. 网络是否正常\n2. Base URL 是否可访问\n3. 是否需要科学上网');
+    });
+
+    if (!resp.ok) {
+      var errText = await resp.text();
+      throw new Error('API ' + resp.status + ': ' + errText.slice(0, 200));
+    }
+
+    var fullText = '';
+    var msgIdx = state.history.length;
+    state.history.push({role:'ai', text: '', chips: []});
+    var reader = resp.body.getReader();
+    var decoder = new TextDecoder();
+
+    render();
+
+    while (true) {
+      var chunk = await reader.read();
+      if (chunk.done) break;
+      var decoded = decoder.decode(chunk.value, {stream: true});
+      var lines = decoded.split('\n');
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i].trim();
+        if (line.startsWith('data: ')) {
+          var data = line.slice(6);
+          if (data === '[DONE]') continue;
+          try {
+            var json = JSON.parse(data);
+            var delta = json.choices && json.choices[0] && json.choices[0].delta && json.choices[0].delta.content;
+            if (delta) {
+              fullText += delta;
+              var displayText = fullText.replace(/\[SEARCH:\s*[^\]]+\]/g, '🔍 正在为你联网搜索...');
+              state.history[msgIdx].text = fullText;
+              updateBubbleText(msgIdx, escapeAndFormat(displayText));
+              els.msgs.scrollTop = els.msgs.scrollHeight;
+            }
+          } catch(e) {}
+        }
+      }
+    }
+
+    var searchMatch = fullText.match(/\[SEARCH:\s*([^\]]+?)\]/);
+    var finalText = fullText;
+
+    if (searchMatch) {
+      var query = searchMatch[1].trim();
+      showStatus('🔍 正在联网搜索：' + query);
+      var tavilyKey2 = getTavilyKey();
+      var searchContext2 = '';
+
+      if (tavilyKey2) {
+        var liveResults = await tavilySearch(query);
+        if (liveResults.length > 0) {
+          searchContext2 = '\n\n## 🔍 实时联网搜索结果（已取回，共 ' + liveResults.length + ' 条）：\n';
+          liveResults.slice(0, 5).forEach(function(r, i){
+            searchContext2 += (i+1) + '. **' + (r.title || '无标题') + '**\n   ' + (r.content || '').slice(0, 300) + '\n   🔗 ' + (r.url || '') + '\n';
+          });
+        } else {
+          searchContext2 = '\n\n## 🔍 联网搜索：未返回结果。请基于训练知识回答，但明说"搜了但没获取到结果"。\n';
+        }
+      } else {
+        searchContext2 = '\n\n## 🔍 联网状态：用户未配置 Tavily key。**请明说："⚠️ 我暂时无法实时联网，以下推荐基于训练数据，请用户自己核验最新信息"。**\n';
+      }
+
+      showStatus('基于联网结果生成回复...');
+      var assistantDraft = fullText.replace(/\[SEARCH:[^\]]+\]/g, '').trim();
+      var messages2 = [{role: 'system', content: COACH_PROMPT + '\n\n## 🧠 实时记忆快照（你必须每轮都看到）\n' + getMemorySnapshot() + searchContext2}];
+      state.history.slice(0, -1).slice(-10).forEach(function(m){
+        messages2.push({role: m.role === 'u' ? 'user' : 'assistant', content: m.text});
+      });
+      messages2.push({role: 'user', content: userText});
+      messages2.push({role: 'assistant', content: assistantDraft || '（上一轮生成了 [SEARCH: ' + query + '] 标记，提示需要联网）'});
+      messages2.push({role: 'user', content: '请基于上面的联网搜索结果重新组织回复。要求：1) 开篇必须明确说"我刚刚在网上搜索了：' + query + '"或"⚠️ 暂时无法联网，按训练数据来"；2) 推荐具体工具时直接采用搜索结果里的真实名称、价格、URL，不要抹造；3) 去掉任何 [SEARCH: ...] 标记；4) 保持 Markdown 格式，末尾给 [OPTIONS] 块；5) 严格遵守零样本迁移、动态变量注入原则。'});
+
+      var resp2 = await fetch(config.baseUrl + '/chat/completions', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + config.apiKey},
+        body: JSON.stringify({model: config.model, messages: messages2, stream: false, temperature: 0.6})
+      });
+      if (resp2.ok) {
+        var data2 = await resp2.json();
+        var content2 = data2.choices && data2.choices[0] && data2.choices[0].message && data2.choices[0].message.content;
+        if (content2) {
+          finalText = content2.replace(/\[SEARCH:[^\]]+\]/g, '').trim();
+          state.history[msgIdx].text = finalText;
+          updateBubbleText(msgIdx, escapeAndFormat(finalText));
+          els.msgs.scrollTop = els.msgs.scrollHeight;
+        }
+      } else {
+        finalText = '🔍 我刚刚试图联网搜索「' + query + '」但二次生成失败，以下列内容按初版思路回答（可能不够准确）：\n\n' + assistantDraft;
+        state.history[msgIdx].text = finalText;
+        updateBubbleText(msgIdx, escapeAndFormat(finalText));
+      }
+    }
+
+    var coachReply = parseCoachReply(finalText);
+    var finalParsedText, finalChips, finalStep;
+    if (coachReply.isJSON) {
+      finalParsedText = coachReply.text;
+      finalChips = coachReply.chips;
+      finalStep = coachReply.current_step;
+      // ★ 关键：LLM 每轮都可以主动更新 profile
+      if (coachReply.profile_update) {
+        applyProfileUpdate(coachReply.profile_update);
+      }
+    } else {
+      var legacy = parseLLMReply(finalText);
+      finalParsedText = legacy.text;
+      finalChips = legacy.chips;
+      finalStep = '';
+    }
+    state.history[msgIdx] = {
+      role: 'ai',
+      text: finalParsedText,
+      chips: finalChips,
+      stepTitle: finalStep || (state.history[msgIdx] && state.history[msgIdx].stepTitle) || ''
+    };
+    render();
+    renderPlan();
+    hideStatus();
+  } catch (err) {
+    hideStatus();
+    addMessage('ai', '❌ <b>出错了</b>\n\n' + err.message + '\n\n请检查：\n1. API Key 是否正确\n2. Base URL 是否可访问\n3. 模型名称是否支持', [], '❌ 错误');
+  } finally {
+    els.sb.disabled = false;
+  }
+}
+
+// ==================== 解析 LLM 输出 ====================
+function parseCoachReply(text) {
+  var fence = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  var jsonStr = fence ? fence[1].trim() : text.trim();
+  var firstBrace = jsonStr.indexOf('{');
+  var lastBrace = jsonStr.lastIndexOf('}');
+  if (firstBrace >= 0 && lastBrace > firstBrace) {
+    var candidate = jsonStr.substring(firstBrace, lastBrace + 1);
+    try {
+      var obj = JSON.parse(candidate);
+      var t = typeof obj.text === 'string' ? obj.text : '';
+      var opts = Array.isArray(obj.options) ? obj.options : [];
+      var step = typeof obj.current_step === 'string' ? obj.current_step : '';
+      var profileUpdate = (obj.profile_update && typeof obj.profile_update === 'object') ? obj.profile_update : null;
+      var filtered = opts.filter(function(o){ return typeof o === 'string' && o.trim().length > 0; }).slice(0, 4);
+      var chips = filtered.map(function(l){ return {l: l, n: ''}; });
+      return { text: t, options: filtered, current_step: step, profile_update: profileUpdate, chips: chips, isJSON: true };
+    } catch (e) { /* fall through */ }
+  }
+  return { text: text, options: [], current_step: '', profile_update: null, chips: [], isJSON: false };
+}
+
+// ==================== 应用 LLM 给出的 profile_update ====================
+// 这是 LLM 能"主动更新用户记忆"的机制。每轮 LLM 都可以填这个字段，
+// 前端解析后调用 setProfile()，让右侧方案书 + 决策历史 + LLM 下轮的 snapshot 全部同步。
+var PROFILE_KEY_ALIAS = {
+  // 别名 → 规范名
+  '小白': '纯小白', '有基础': '有基础', '专业': '专业人士', '专业人士': '专业人士',
+  '极客': 'AI 极客', 'AI极客': 'AI 极客',
+  '兴趣': '兴趣与探索', '求职': '求职与作品集', '痛点': '解决个人痛点', '商业': '商业/业务落地',
+  'skill': 'Skill', 'Skill': 'Skill', 'agent': 'Agent', 'Agent': 'Agent', '融合体': '融合体',
+  '能上网': '可科学上网', '科学上网': '可科学上网', '国内': '国内直连',
+  '0-50': '0-50', '0~50': '0-50', '低预算': '0-50', '50-150': '50-150', '50~150': '50-150',
+  '150+': '150+', '不差钱': '150+'
+};
+function applyProfileUpdate(update) {
+  if (!update) return;
+  var validKeys = ['background', 'purpose', 'pain', 'form', 'network', 'budget', 'pickedTool', 'pickedPlan'];
+  Object.keys(update).forEach(function(rawKey) {
+    var key = validKeys.indexOf(rawKey) >= 0 ? rawKey : null;
+    if (!key) return;
+    var val = String(update[rawKey] || '').trim();
+    if (!val) return;
+    // 别名归一
+    if (PROFILE_KEY_ALIAS[val]) val = PROFILE_KEY_ALIAS[val];
+    setProfile(key, val);
+  });
+}
+
+function parseLLMReply(text) {
+  var chips = [];
+  var cleanText = text;
+
+  var match = text.match(/\[OPTIONS\]([\s\S]*?)\[\/OPTIONS\]/);
+  if (match) {
+    var lines = match[1].split('\n');
+    var stepHeaderRe = /^\s*(?:📍\s*)?(?:Step|阶段|Step\s*\d+|阶段\s*\d+)\s*[\d：:]/i;
+    var stepHeaderReLoose = /^\s*📍\s*Step\s*\d+/;
+    lines.forEach(function(line){
+      var m = line.match(/^[\s\-\*]+(.+)/);
+      if (m) {
+        var label = m[1].replace(/\*\*/g, '').split('—')[0].split(' - ')[0].split('–')[0].trim();
+        if (label && label.length > 0 && !stepHeaderRe.test(label) && !stepHeaderReLoose.test(label)) {
+          chips.push({l: label, n: ''});
+        }
+      }
+    });
+    cleanText = text.replace(/\[OPTIONS\][\s\S]*?\[\/OPTIONS\]/g, '').trim();
+  } else {
+    var lines = text.split('\n');
+    var newChips = [];
+    var newTextLines = [];
+    var emojiCharRe = /[🎲💼⚡🌍🟢🟡🔵💰🤖📚🏠🎨🛠🐣🌱🌳🚀🎯💡🙅✅❌✍️🤝📋🔧👤👥📢💰🤖💼📱🏢🌐🚀🤔🎮🔍⏰📥🆘🆓🔀🏆🥈🥉📄🤓✋✊✌️👆👇👈👉🌍🇨🇳💎💵💰✨⚙️🧩🛠🎯💡🙅✅❌]/;
+    var stepHeaderRe = /^\s*(?:📍\s*)?(?:Step|阶段|Step\s*\d+|阶段\s*\d+)\s*[\d：:]/i;
+    var stepHeaderReLoose = /^\s*📍\s*Step\s*\d+/;
+    lines.forEach(function(line){
+      if (stepHeaderRe.test(line) || stepHeaderReLoose.test(line)) {
+        newTextLines.push(line);
+        return;
+      }
+      var nm = line.match(/^(\d+)\s*[\.\)、、]?\s*(.+)/);
+      if (nm && emojiCharRe.test(nm[2]) && nm[2].length < 80 && newChips.length < 6) {
+        newChips.push({l: nm[2].trim().replace(/\*\*/g, ''), n: ''});
+        return;
+      }
+      var m = line.match(/^[\s\-\*•]+(.{1,4})\s*(.+)/);
+      if (m && emojiCharRe.test(m[1]) && m[1].length <= 4 && newChips.length < 6) {
+        newChips.push({l: m[1] + ' ' + m[2].replace(/\*\*/g, '').trim(), n: ''});
+      } else {
+        newTextLines.push(line);
+      }
+    });
+    if (newChips.length >= 2) {
+      chips = newChips;
+      cleanText = newTextLines.join('\n').trim();
+    }
+  }
+
+  return {text: cleanText, chips: chips};
+}
+
+// ==================== 工具函数 ====================
+function updateBubbleText(idx, text) {
+  var msgs = els.msgs.querySelectorAll('.msg');
+  if (!msgs[idx]) return;
+  var bub = msgs[idx].querySelector('.bub');
+  if (bub) bub.innerHTML = text;
+}
+
+function showStatus(text) {
+  var bar = document.getElementById('statusBar');
+  var t = document.getElementById('statusText');
+  if (t) t.textContent = text || 'Coach 正在思考...';
+  if (bar) bar.style.display = 'flex';
+}
+function hideStatus() {
+  var bar = document.getElementById('statusBar');
+  if (bar) bar.style.display = 'none';
+}
+
+function smartFormat(text) {
+  if (!text) return '';
+  text = String(text)
+    .replace(/<b\b[^>]*>([\s\S]*?)<\/b>/gi, '**$1**')
+    .replace(/<strong\b[^>]*>([\s\S]*?)<\/strong>/gi, '**$1**')
+    .replace(/<i\b[^>]*>([\s\S]*?)<\/i>/gi, '*$1*')
+    .replace(/<em\b[^>]*>([\s\S]*?)<\/em>/gi, '*$1*')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<p[^>]*>/gi, '')
+    .replace(/<\/?u>/gi, '');
+
+  text = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  text = text.replace(/^###\s+(.+)$/gm, '<div class="big-title">📌 $1</div>');
+  text = text.replace(/^##\s+(.+)$/gm, '<div class="big-title">📌 $1</div>');
+
+  text = text.replace(/^(\d+)\.\s*\*\*(.+?)\*\*\s*[：:]/gm, '<div class="big-title">$1️⃣ $2</div>');
+
+  var labelMap = {
+    '优点': '✨', '优势': '✨', '推荐': '⭐',
+    '操作': '🔧', '步骤': '📍', '方法': '📋',
+    '示例': '📌', '举例': '📌', '例子': '📌',
+    '重点': '🎯', '提示': '💡', '小贴士': '💡',
+    '注意': '⚠️', '缺点': '⚠️', '风险': '⚠️',
+    '总结': '📝', '小结': '📝', '结论': '📝',
+    '问题': '❓', '答案': '✅', '结果': '✅'
+  };
+  Object.keys(labelMap).forEach(function(key){
+    var re = new RegExp('\\*\\*' + key + '\\*\\*\\s*[：:]', 'g');
+    text = text.replace(re, '<span class="label">' + labelMap[key] + ' ' + key + '</span>：');
+  });
+
+  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  text = text.replace(/(^|[^\*])\*([^\*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+
+  // 代码块
+  text = text.replace(/```([\s\S]*?)```/g, function(m, code){ return '<pre><code>' + code + '</code></pre>'; });
+  text = text.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+
+  text = text.replace(/^\s*[-•*]\s+(.+)$/gm, '<div class="list-item">$1</div>');
+  text = text.replace(/^\s*(\d+)\.\s+(?![\*])(.+)$/gm, '<div class="list-item">$1. $2</div>');
+  text = text.replace(/^&gt;\s?(.+)$/gm, '<div class="list-item" style="border-left:3px solid #2c5cff;padding-left:10px;color:#555">$1</div>');
+  text = text.replace(/^---+$/gm, '<hr class="divider">');
+
+  text = text.replace(/\n/g, '<br>');
+
+  return text;
+}
+
+function escapeAndFormat(text) { return smartFormat(text); }
+
+function reset() {
+  state.history = [];
+  state.wantingChange = false;
+  profile = {
+    background: '', purpose: '', pain: '', painChips: [],
+    form: '', network: '', budget: '', tools: '', pickedTool: '',
+    planA: null, planB: null, pickedPlan: null,
+    confirmed: {}, history: []
+  };
+  els.prev.innerHTML = '<div class="ph">完成所有阶段后，方案书会在这里实时生成 ✨</div>';
+  showNode('s1');
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+<style>
+#minimax-floating-ball {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 12px;
+  background: #222222;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  color: #F8F8F8;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  z-index: 9999;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+#minimax-floating-ball:hover {
+  transform: translateY(-2px);
+  background: #383838;
+}
+.minimax-ball-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.minimax-logo-wave {
+  width: 20px;
+  height: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg%20preserveAspectRatio%3D%27none%27%20width%3D%27100%25%27%20height%3D%27100%25%27%20overflow%3D%27visible%27%20style%3D%27display%3A%20block%3B%27%20viewBox%3D%270%200%20170.136%20138.225%27%20fill%3D%27none%27%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%3E%3Cg%20id%3D%27Frame%202116748449%27%3E%3Cpath%20id%3D%27Subtract%27%20d%3D%27M170%20101.783C170%20105.144%20168.49%20108.327%20165.886%20110.453L134.963%20135.702C132.964%20137.334%20130.463%20138.225%20127.883%20138.225H10.4938C4.69824%20138.225%200%20133.527%200%20127.732V39.2289C0%2035.8597%201.51758%2032.6698%204.13162%2030.5442L38.5402%202.56547C40.536%200.942662%2043.0298%200.0567377%2045.602%200.0567377H159.506C165.302%200.0567377%20170%204.75498%20170%2010.5506V101.783Z%27%20fill%3D%27black%27%20style%3D%27fill%3Ablack%3Bfill-opacity%3A1%3B%27/%3E%3Cpath%20id%3D%27Subtract_2%27%20d%3D%27M149.011%2094.4632C149.011%2096.1471%20148.253%2097.7415%20146.946%2098.8043L125.893%20115.936C124.895%20116.748%20123.648%20117.191%20122.361%20117.191H24.6479C22.716%20117.191%2021.15%20115.625%2021.15%20113.693V46.1166C21.15%2044.4267%2021.9135%2042.8274%2023.2274%2041.7648L47.367%2022.2437C48.3638%2021.4376%2049.607%2020.9982%2050.8888%2020.9988L145.514%2021.0427C147.446%2021.0436%20149.011%2022.6094%20149.011%2024.5406V94.4632Z%27%20fill%3D%27white%27%20style%3D%27fill%3Awhite%3Bfill-opacity%3A1%3B%27/%3E%3Cpath%20id%3D%27Rectangle%20111142564%27%20d%3D%27M42.111%2080.8025C42.111%2077.7115%2044.6167%2075.2057%2047.7077%2075.2057H60.9999C64.0908%2075.2057%2066.5966%2077.7115%2066.5966%2080.8025V121.029H42.111V80.8025Z%27%20fill%3D%27black%27%20style%3D%27fill%3Ablack%3Bfill-opacity%3A1%3B%27/%3E%3Cpath%20id%3D%27Rectangle%20111142567%27%20d%3D%27M79.1894%2080.8025C79.1894%2077.7115%2081.6952%2075.2057%2084.7861%2075.2057H98.0783C101.169%2075.2057%20103.675%2077.7115%20103.675%2080.8025V121.029H79.1894V80.8025Z%27%20fill%3D%27black%27%20style%3D%27fill%3Ablack%3Bfill-opacity%3A1%3B%27/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 14px 11px;
+  background-color: #8FD1FF;
+  border-radius: 4px;
+}
+
+.minimax-ball-text {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.minimax-close-icon {
+  margin-left: 8px;
+  font-size: 16px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.minimax-close-icon:hover {
+  opacity: 1;
+}
+</style>
+<div id="minimax-floating-ball">
+  <div class="minimax-ball-content">
+    <div class="minimax-logo-wave"></div>
+    <span class="minimax-ball-text">Created by MiniMax Agent</span>
+  </div>
+  <div class="minimax-close-icon">×</div>
+</div>
+<script>
+// Initialize floating ball functionality
+function initFloatingBall() {
+  const ball = document.getElementById('minimax-floating-ball');
+  if (!ball) return;
+
+  // Initial animation
+  ball.style.opacity = '0';
+  ball.style.transform = 'translateY(20px)';
+
+  setTimeout(() => {
+    ball.style.opacity = '1';
+    ball.style.transform = 'translateY(0)';
+  }, 500);
+
+  // Handle logo click
+  const ballContent = ball.querySelector('.minimax-ball-content');
+  ballContent.addEventListener('click', function (e) {
+    e.stopPropagation();
+    window.open('https://agent.minimaxi.com/', '_blank');
+    ball.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+      ball.style.transform = 'scale(1)';
+    }, 100);
+  });
+
+  // Handle close button click
+  const closeIcon = ball.querySelector('.minimax-close-icon');
+  closeIcon.addEventListener('click', function (e) {
+    e.stopPropagation();
+    ball.style.opacity = '0';
+    ball.style.transform = 'translateY(20px)';
+
+    setTimeout(() => {
+      ball.style.display = 'none';
+    }, 300);
+  });
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', initFloatingBall); 
+</script>
+</body>
+</html>
