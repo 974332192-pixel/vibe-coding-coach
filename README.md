@@ -1,4 +1,4 @@
-# Vibe Coding Coach# Vibe Coding Coach
+# Vibe Coding Coach
 
 > 一个单文件 HTML 实现的「对话式 AI 教练」：Vibe Coding Coach 是一款通过8步结构化引导与智能工具匹配，将模糊想法转化为标准化AI开发执行清单的Vibe Coding前置导航工具。
 
